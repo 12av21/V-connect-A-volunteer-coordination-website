@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Volunteers - V-Connect</title>
+    <link rel="icon" href="../assets/v1.png" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/organizer/managevolunteers.css">
+</head>
+
+<body>
+   
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+    <nav class="sidebar">
+        <a href="organizerDashboard.html" class="sidebar-logo">
+            <i class="fas fa-hands-helping"></i>
+            <span>V-Connect</span>
+        </a>
+        <div class="nav flex-column">
+            <a href="organizerDashboard.html" class="nav-link ">
+                <i class="fas fa-home"></i>
+                Dashboard
+            </a>
+            <a href="organizerProfile.html" class="nav-link">
+                <i class="fas fa-user"></i>
+                Profile
+            </a>
+
+            <a href="createEvent.html" class="nav-link">
+                <i class="fas fa-calendar-plus"></i>
+                Create Event
+            </a>
+
+            <a href="manageEvents.html" class="nav-link">
+                <i class="fas fa-tasks"></i>
+                Manage Events
+            </a>
+
+            <a href="manageVolunteers.html" class="nav-link active">
+                <i class="fas fa-users"></i>
+                Manage Volunteers
+            </a>
+            <a href="eventCompletion.html" class="nav-link">
+                <i class="fas fa-check-circle"></i>
+                Event Completion
+            </a>
+            <a href="#" class="nav-link" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </a>
+        </div>
+    </nav>
+   
+    <div class="main-content">
+        <div class="container">
+           
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Manage Volunteers</h2>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary" id="exportBtn">
+                        <i class="fas fa-download me-2"></i>Export Data
+                    </button>
+                    <button class="btn btn-primary" id="refreshBtn">
+                        <i class="fas fa-sync-alt me-2"></i>Refresh
+                    </button>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <select class="form-select" id="eventFilter">
+                            <option value="">All Events</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" id="statusFilter">
+                            <option value="">All Statuses</option>
+                            <option value="pending">Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" class="form-control search-input" id="searchInput"
+                                placeholder="Search volunteers...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="volunteersList">
+             
+            </div>
+        </div>
+    </div>
+
+    <div class="points-modal modal fade" id="awardPointsModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Award Points & Badges</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="pointsForm">
+                        <input type="hidden" id="volunteerId">
+                        <div class="mb-3">
+                            <label class="form-label">Points to Award</label>
+                            <input type="number" class="form-control" id="pointsInput" min="0" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Badge Type</label>
+                            <select class="form-select" id="badgeType">
+                                <option value="participation">Participation</option>
+                                <option value="excellence">Excellence</option>
+                                <option value="leadership">Leadership</option>
+                                <option value="dedication">Dedication</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Comments</label>
+                            <textarea class="form-control" id="pointsComment" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="awardPointsBtn">Award Points</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../config/firebaseConfig.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import {
+            getAuth,
+            onAuthStateChanged,
+            signOut
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import {
+            getFirestore,
+            collection,
+            query,
+            where,
+            getDocs,
+            getDoc,
+            updateDoc,
+            doc,
+            addDoc
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        async function loadEventFilter() {
+            try {
+                const user = auth.currentUser;
+                if (!user) return;
+
+                const eventsQuery = query(
+                    collection(db, "events"),
+                    where("organizerId", "==", user.uid)
+                );
+
+                const snapshot = await getDocs(eventsQuery);
+                const eventFilter = document.getElementById('eventFilter');
+                eventFilter.innerHTML = '<option value="">All Events</option>';
+
+                snapshot.forEach(doc => {
+                    const event = doc.data();
+                    eventFilter.innerHTML += `
+                        <option value="${doc.id}">${event.title}</option>
+                    `;
+                });
+            } catch (error) {
+                console.error("Error loading events:", error);
+            }
+        }
+
+        async function loadVolunteers(eventId = '', status = '', searchQuery = '') {
+            showLoading();
+            const volunteersList = document.getElementById('volunteersList');
+            volunteersList.innerHTML = '';
+
+            try {
+                const user = auth.currentUser;
+                if (!user) throw new Error('Please sign in');
+
+                const eventsQuery = query(
+                    collection(db, "events"),
+                    where("organizerId", "==", user.uid)
+                );
+
+                const eventsSnapshot = await getDocs(eventsQuery);
+                const organizerEventIds = eventsSnapshot.docs.map(doc => doc.id);
+                const eventsMap = new Map(eventsSnapshot.docs.map(doc => [doc.id, doc.data()]));
+
+                if (organizerEventIds.length === 0) {
+                    volunteersList.innerHTML = `
+                <div class="text-center py-5">
+                    <i class="fas fa-info-circle fa-3x text-muted mb-3"></i>
+                    <h5>No Events Created</h5>
+                    <p class="text-muted">Create events first to see volunteer applications</p>
+                </div>`;
+                    hideLoading();
+                    return;
+                }
+
+                let applicationsQuery = query(
+                    collection(db, "applications"),
+                    where("eventId", "in", organizerEventIds)
+                );
+
+                if (status) {
+                    applicationsQuery = query(applicationsQuery, where("status", "==", status));
+                }
+
+                const applicationsSnapshot = await getDocs(applicationsQuery);
+
+                if (applicationsSnapshot.empty) {
+                    volunteersList.innerHTML = `
+                <div class="text-center py-5">
+                    <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                    <h5>No Applications Found</h5>
+                    <p class="text-muted">No volunteer applications match your criteria</p>
+                </div>`;
+                    hideLoading();
+                    return;
+                }
+
+                for (const applicationDoc of applicationsSnapshot.docs) {
+                    const applicationData = applicationDoc.data();
+                    const eventData = eventsMap.get(applicationData.eventId);
+
+                    if (!eventData) continue;
+
+                    const volunteerDoc = await getDoc(doc(db, "users", applicationData.userId));
+                    if (!volunteerDoc.exists()) continue;
+                    const volunteerData = volunteerDoc.data();
+
+                    if (searchQuery && !volunteerData.displayName.toLowerCase().includes(searchQuery.toLowerCase())) {
+                        continue;
+                    }
+
+                    if (eventId && applicationData.eventId !== eventId) {
+                        continue;
+                    }
+
+                    const card = createVolunteerCard(
+                        applicationDoc.id,
+                        applicationData,
+                        eventData,
+                        volunteerData
+                    );
+                    volunteersList.appendChild(card);
+                }
+
+            } catch (error) {
+                console.error("Error loading volunteers:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to load volunteers'
+                });
+            } finally {
+                hideLoading();
+            }
+        }
+        function createVolunteerCard(applicationId, applicationData, eventData, volunteerData) {
+            const card = document.createElement('div');
+            card.className = 'volunteer-card';
+
+            const eventDate = eventData.date ? new Date(eventData.date).toLocaleDateString() : 'Date not set';
+            const appliedDate = applicationData.appliedAt ? new Date(applicationData.appliedAt).toLocaleDateString() : 'Date not set';
+
+            const displayName = volunteerData?.name || 'Anonymous';
+            const email = volunteerData?.email || 'No email provided';
+            const phone = volunteerData?.phone || 'No phone provided';
+            const points = volunteerData?.points || 0;
+            const badges = volunteerData?.badges || [];
+            const defaultAvatarBase64 = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI3MCIgaGVpZ2h0PSI3MCIgdmlld0JveD0iMCAwIDcwIDcwIj48cmVjdCB3aWR0aD0iNzAiIGhlaWdodD0iNzAiIGZpbGw9IiNlMWUxZTEiLz48Y2lyY2xlIGN4PSIzNSIgY3k9IjI1IiByPSIxNSIgZmlsbD0iI2IwYjBiMCIvPjxwYXRoIGQ9Ik0xNSw2MEMxNSw0NS42NDc0NywyNi42NDc0NywzNSw0MSwzNWgyNnYyNUgxNXoiIGZpbGw9IiNiMGIwYjAiLz48L3N2Zz4=';
+
+            const photoURL = volunteerData?.photoURL || defaultAvatarBase64;
+
+            card.innerHTML = `
+        <div class="d-flex justify-content-between align-items-start">
+            <div class="d-flex gap-4">
+                <img src="${photoURL}" 
+                     alt="${volunteerData?.displayName || 'Volunteer'}" 
+                     class="volunteer-profile-img"
+                     onerror="this.src='${defaultAvatarBase64}'">
+                <div class="volunteer-info">
+                    <h5>${displayName}</h5>
+                    <p class="text-muted mb-2">
+                        <i class="fas fa-calendar-alt me-2"></i>
+                        <strong>Event:</strong> ${eventData.title || 'Untitled Event'}
+                    </p>
+                    <p class="mb-2">
+                        <i class="fas fa-clock me-2"></i>
+                        <strong>Event Date:</strong> ${eventDate}
+                    </p>
+                    <p class="mb-2">
+                        <i class="fas fa-envelope me-2"></i>
+                        ${email}
+                    </p>
+                    <p class="mb-2">
+                        <i class="fas fa-phone me-2"></i>
+                        ${phone}
+                    </p>
+                    <div class="mt-2">
+                        <span class="points-badge">
+                            <i class="fas fa-star"></i>
+                            ${points} Points
+                        </span>
+                        ${badges.length > 0 ? `
+                            <div class="badges-container mt-2">
+                                ${badges.map(badge => `
+                                    <span class="badge bg-secondary me-1">
+                                        <i class="fas fa-award me-1"></i>${badge}
+                                    </span>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+            <div class="text-end">
+                <span class="status-badge status-${applicationData.status || 'pending'}">
+                    ${applicationData.status || 'pending'}
+                </span>
+                <div class="mt-2">
+                    <small class="text-muted d-block">
+                        <i class="fas fa-clock me-1"></i>
+                        Applied: ${appliedDate}
+                    </small>
+                </div>
+            </div>
+        </div>
+        <div class="mt-4 border-top pt-3">
+            <div class="d-flex justify-content-end gap-2">
+                ${applicationData.status === 'pending' ? `
+                    <button class="btn btn-success btn-sm" 
+                            onclick="approveVolunteer('${applicationId}', '${applicationData.userId}', '${applicationData.eventId}')">
+                        <i class="fas fa-check me-2"></i>Approve
+                    </button>
+                    <button class="btn btn-danger btn-sm"
+                            onclick="rejectVolunteer('${applicationId}', '${applicationData.userId}', '${applicationData.eventId}')">
+                        <i class="fas fa-times me-2"></i>Reject
+                    </button>
+                ` : ''}
+                ${applicationData.status === 'approved' && !applicationData.completed ? `
+                    <button class="btn btn-info btn-sm"
+                            onclick="markEventCompleted('${applicationId}', '${applicationData.userId}', '${applicationData.eventId}')">
+                        <i class="fas fa-check-double me-2"></i>Mark Completed
+                    </button>
+                ` : ''}
+                ${applicationData.status === 'approved' && applicationData.completed && !applicationData.awarded ? `
+                    <button class="btn btn-primary btn-sm"
+                            onclick="awardPoints('${applicationData.userId}', '${displayName}', '${applicationId}')">
+                        <i class="fas fa-award me-2"></i>Award Points
+                    </button>
+                ` : ''}
+                ${applicationData.awarded ? `
+                    <span class="badge bg-success">
+                        <i class="fas fa-certificate me-2"></i>Awarded
+                    </span>
+                ` : ''}
+            </div>
+        </div>
+    `;
+
+            return card;
+        }
+
+        window.awardPoints = async function (volunteerId, volunteerName) {
+            const modal = new bootstrap.Modal(document.getElementById('awardPointsModal'));
+            document.getElementById('volunteerId').value = volunteerId;
+            modal.show();
+        };
+
+        document.getElementById('awardPointsBtn').addEventListener('click', async () => {
+            try {
+                const volunteerId = document.getElementById('volunteerId').value;
+                const points = parseInt(document.getElementById('pointsInput').value);
+                const badgeType = document.getElementById('badgeType').value;
+                const comment = document.getElementById('pointsComment').value;
+
+                if (!points || points < 0) {
+                    throw new Error('Please enter a valid number of points');
+                }
+
+                const volunteerRef = doc(db, "users", volunteerId);
+                const volunteerDoc = await getDoc(volunteerRef);
+                const currentPoints = volunteerDoc.data()?.points || 0;
+                const currentBadges = volunteerDoc.data()?.badges || [];
+
+                await updateDoc(volunteerRef, {
+                    points: currentPoints + points,
+                    badges: [...new Set([...currentBadges, badgeType])],
+                    updatedAt: new Date().toISOString()
+                });
+
+                await addDoc(collection(db, "pointsHistory"), {
+                    volunteerId,
+                    points,
+                    badgeAwarded: badgeType,
+                    comment,
+                    awardedBy: auth.currentUser.uid,
+                    createdAt: new Date().toISOString()
+                });
+
+                await addDoc(collection(db, "notifications"), {
+                    userId: volunteerId,
+                    title: "Points Awarded!",
+                    message: `You've been awarded ${points} points and a ${badgeType} badge!`,
+                    type: "points_awarded",
+                    read: false,
+                    createdAt: new Date().toISOString()
+                });
+
+                bootstrap.Modal.getInstance(document.getElementById('awardPointsModal')).hide();
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Points Awarded!',
+                    text: `Successfully awarded ${points} points to the volunteer.`,
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+
+                loadVolunteers();
+            } catch (error) {
+                console.error("Error awarding points:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message
+                });
+            }
+        });
+
+        window.approveVolunteer = async function (applicationId, volunteerId, eventId) {
+            try {
+                const result = await Swal.fire({
+                    title: 'Approve Volunteer?',
+                    text: "Are you sure you want to approve this volunteer?",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, approve'
+                });
+
+                if (result.isConfirmed) {
+              
+                    await updateDoc(doc(db, "applications", applicationId), {
+                        status: 'approved',
+                        updatedAt: new Date().toISOString()
+                    });
+
+                    await addDoc(collection(db, "notifications"), {
+                        userId: volunteerId,
+                        title: "Application Approved!",
+                        message: "Your volunteer application has been approved.",
+                        type: "application_approved",
+                        read: false,
+                        createdAt: new Date().toISOString()
+                    });
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Volunteer Approved',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+
+                    loadVolunteers();
+                }
+            } catch (error) {
+                console.error("Error approving volunteer:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to approve volunteer. Please try again.'
+                });
+            }
+        };
+        window.rejectVolunteer = async function (applicationId, volunteerId, eventId) {
+            try {
+                const { value: reason } = await Swal.fire({
+                    title: 'Reject Volunteer',
+                    input: 'textarea',
+                    inputLabel: 'Reason for rejection (optional)',
+                    inputPlaceholder: 'Enter your reason here...',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Reject'
+                });
+
+                if (reason !== undefined) {
+                    await updateDoc(doc(db, "applications", applicationId), {
+                        status: 'rejected',
+                        rejectionReason: reason,
+                        updatedAt: new Date().toISOString()
+                    });
+                    await addDoc(collection(db, "notifications"), {
+                        userId: volunteerId,
+                        title: "Application Status Update",
+                        message: reason ?
+                            `Your application has been declined. Reason: ${reason}` :
+                            "Your application has been declined.",
+                        type: "application_rejected",
+                        read: false,
+                        createdAt: new Date().toISOString()
+                    });
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Volunteer Rejected',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+
+                    loadVolunteers();
+                }
+            } catch (error) {
+                console.error("Error rejecting volunteer:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to reject volunteer. Please try again.'
+                });
+            }
+        };
+        document.getElementById('eventFilter').addEventListener('change', (e) => {
+            loadVolunteers(
+                e.target.value,
+                document.getElementById('statusFilter').value,
+                document.getElementById('searchInput').value
+            );
+        });
+
+        document.getElementById('statusFilter').addEventListener('change', (e) => {
+            loadVolunteers(
+                document.getElementById('eventFilter').value,
+                e.target.value,
+                document.getElementById('searchInput').value
+            );
+        });
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            loadVolunteers(
+                document.getElementById('eventFilter').value,
+                document.getElementById('statusFilter').value,
+                e.target.value
+            );
+        });
+
+        document.getElementById('refreshBtn').addEventListener('click', () => {
+            loadVolunteers();
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error("Error signing out:", error);
+            }
+        });
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                loadEventFilter();
+                loadVolunteers();
+            } else {
+                window.location.href = '/home/signup.html';
+            }
+        });
+
+        window.markEventCompleted = async function (applicationId, volunteerId, eventId) {
+            try {
+                const result = await Swal.fire({
+                    title: 'Mark Event Completed?',
+                    text: "This will indicate that the volunteer has completed their service.",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, mark completed'
+                });
+
+                if (result.isConfirmed) {
+                    await updateDoc(doc(db, "applications", applicationId), {
+                        completed: true,
+                        completedAt: new Date().toISOString()
+                    });
+
+                    await addDoc(collection(db, "notifications"), {
+                        userId: volunteerId,
+                        title: "Event Completion Confirmed",
+                        message: "Your volunteer service has been marked as completed. You will receive your certificate soon!",
+                        type: "event_completed",
+                        read: false,
+                        createdAt: new Date().toISOString()
+                    });
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Event Marked as Completed',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+
+                    loadVolunteers();
+                }
+            } catch (error) {
+                console.error("Error marking event completed:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to mark event as completed'
+                });
+            }
+        };
+    </script>
+</body>
+</html>

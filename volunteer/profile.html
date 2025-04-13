@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volunteer Profile - V-Connect</title>
+    <link rel="icon" href="../assets/v1.png" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/volunteer/profile.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <a href="dashboard.html" class="sidebar-logo">
+            <i class="fas fa-hands-helping"></i>
+            <span>V-Connect</span>
+        </a>
+        <div class="nav flex-column">
+            <a href="dashboard.html" class="nav-link">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a href="profile.html" class="nav-link active">
+                <i class="fas fa-user"></i> Profile
+            </a>
+            <a href="opportunities.html" class="nav-link">
+                <i class="fas fa-search"></i> Find Opportunities
+            </a>
+            <a href="myevents.html" class="nav-link">
+                <i class="fas fa-calendar"></i> My Events
+            </a>
+            <a href="leaderboard.html" class="nav-link ">
+                <i class="fas fa-trophy"></i> Leaderboard
+            </a>
+            <a href="#" class="nav-link" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            <!-- Profile Header -->
+            <div class="profile-header">
+                <div class="row align-items-center">
+                    <div class="col-md-3 text-center">
+                        <div class="profile-avatar-wrapper">
+                            <img src="default-avatar.png" alt="Profile" class="profile-avatar" id="profileAvatar">
+                            <button class="change-photo-btn" onclick="document.getElementById('avatarInput').click()">
+                                <i class="fas fa-camera"></i>
+                            </button>
+                            <input type="file" id="avatarInput" hidden accept="image/*">
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <h2 id="volunteerName" class="mb-1">Loading...</h2>
+                        <p class="text-muted mb-3" id="volunteerEmail">loading@example.com</p>
+                        <div class="d-flex gap-3">
+                            <div>
+                                <strong id="totalHours">0</strong> Hours
+                            </div>
+                            <div>
+                                <strong id="eventsAttended">0</strong> Events
+                            </div>
+                            <div>
+                                <strong id="badgesEarned">0</strong> Badges
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Form -->
+            <div class="profile-form">
+                <form id="profileForm">
+                    <!-- Personal Information -->
+                    <div class="profile-section">
+                        <h3 class="profile-section-title">
+                            <i class="fas fa-user text-primary"></i>
+                            Personal Information
+                        </h3>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="fullName" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Bio</label>
+                                <textarea class="form-control" id="bio" rows="4"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="profile-section">
+                        <h3 class="profile-section-title">
+                            <i class="fas fa-map-marker-alt text-primary"></i>
+                            Contact Information
+                        </h3>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Address</label>
+                                <input type="text" class="form-control" id="address">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">City</label>
+                                <input type="text" class="form-control" id="city">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Interests -->
+                    <div class="profile-section">
+                        <h3 class="profile-section-title">
+                            <i class="fas fa-heart text-primary"></i>
+                            Interests
+                        </h3>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="education" value="education">
+                                    <label class="form-check-label" for="education">Education</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="environment" value="environment">
+                                    <label class="form-check-label" for="environment">Environment</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="health" value="health">
+                                    <label class="form-check-label" for="health">Health</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="community" value="community">
+                                    <label class="form-check-label" for="community">Community</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Social Media Links -->
+                    <div class="profile-section">
+                        <h3 class="profile-section-title">
+                            <i class="fas fa-share-alt text-primary"></i>
+                            Social Media
+                        </h3>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">LinkedIn</label>
+                                <input type="url" class="form-control" id="linkedin">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Twitter</label>
+                                <input type="url" class="form-control" id="twitter">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Badges Section -->
+            <div class="badges-section">
+                <h3 class="profile-section-title mb-4">
+                    <i class="fas fa-medal text-primary"></i>
+                    Earned Badges
+                </h3>
+                <div class="row g-4" id="badgesContainer">
+                    <!-- Badges will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            getDoc, 
+            setDoc, 
+            updateDoc 
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { 
+            getStorage, 
+            ref, 
+            uploadBytes, 
+            getDownloadURL 
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+        // Firebase configuration
+       
+        const firebaseConfig = {
+            apiKey: "AIzaSyBAZ3Zap2Q_KBCtb6OZzdmLfARO6T0lMLg",
+            authDomain: "v-connect-7d896.firebaseapp.com",
+            projectId: "v-connect-7d896",
+            storageBucket: "v-connect-7d896.appspot.com",
+            messagingSenderId: "489654796371",
+            appId: "1:489654796371:web:d0bf7b41970aec11d546a6"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        // Load profile data
+        async function loadProfileData() {
+            try {
+                const user = auth.currentUser;
+                if (!user) throw new Error('Please sign in');
+
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (!userDoc.exists()) throw new Error('Profile not found');
+
+                const userData = userDoc.data();
+
+                // Update profile fields
+                document.getElementById('volunteerName').textContent = userData.name || 'No Name';
+                document.getElementById('volunteerEmail').textContent = user.email;
+                document.getElementById('fullName').value = userData.name || '';
+                document.getElementById('phone').value = userData.phone || '';
+                document.getElementById('bio').value = userData.bio || '';
+                document.getElementById('address').value = userData.address || '';
+                document.getElementById('city').value = userData.city || '';
+                
+                // Update interests
+                if (userData.interests) {
+                    userData.interests.forEach(interest => {
+                        const checkbox = document.getElementById(interest);
+                        if (checkbox) checkbox.checked = true;
+                    });
+                }
+
+                // Update social media links
+                if (userData.social) {
+                    document.getElementById('linkedin').value = userData.social.linkedin || '';
+                    document.getElementById('twitter').value = userData.social.twitter || '';
+                }
+
+                // Update statistics
+                document.getElementById('totalHours').textContent = userData.totalHours || 0;
+                document.getElementById('eventsAttended').textContent = userData.eventsAttended || 0;
+                document.getElementById('badgesEarned').textContent = userData.badges?.length || 0;
+
+                // Load profile image
+                if (userData.photoURL) {
+                    document.getElementById('profileAvatar').src = userData.photoURL;
+                }
+
+                // Load badges
+                loadBadges(userData.badges || []);
+            } catch (error) {
+                console.error("Error loading profile:", error);
+                showError(error.message);
+            }
+        }
+
+        // Load badges
+        function loadBadges(badges) {
+            const badgesContainer = document.getElementById('badgesContainer');
+            badgesContainer.innerHTML = '';
+
+            const badgeInfo = {
+                'Newcomer': { icon: 'fa-star', color: '#FFD700' },
+                'Active Volunteer': { icon: 'fa-award', color: '#C0C0C0' },
+                'Dedicated Helper': { icon: 'fa-medal', color: '#CD7F32' },
+                'Community Champion': { icon: 'fa-trophy', color: '#FFD700' }
+            };
+
+            badges.forEach(badge => {
+                const info = badgeInfo[badge] || { icon: 'fa-certificate', color: '#4ECDC4' };
+                const badgeElement = document.createElement('div');
+                badgeElement.className = 'col-md-3';
+                badgeElement.innerHTML = `
+                    <div class="badge-item">
+                        <i class="fas ${info.icon} badge-icon" style="color: ${info.color}"></i>
+                        <h5>${badge}</h5>
+                    </div>
+                `;
+                badgesContainer.appendChild(badgeElement);
+            });
+        }
+
+        // Handle profile form submission
+        document.getElementById('profileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const user = auth.currentUser;
+                if (!user) throw new Error('Please sign in');
+
+                // Get selected interests
+                const interests = ['education', 'environment', 'health', 'community']
+                    .filter(interest => document.getElementById(interest).checked);
+
+                const formData = {
+                    name: document.getElementById('fullName').value,
+                    phone: document.getElementById('phone').value,
+                    bio: document.getElementById('bio').value,
+                    address: document.getElementById('address').value,
+                    city: document.getElementById('city').value,
+                    interests: interests,
+                    social: {
+                        linkedin: document.getElementById('linkedin').value,
+                        twitter: document.getElementById('twitter').value
+                    },
+                    updatedAt: new Date().toISOString()
+                };
+
+                await updateDoc(doc(db, "users", user.uid), formData);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Profile Updated',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+
+                // Reload profile data
+                loadProfileData();
+
+            } catch (error) {
+                console.error("Error updating profile:", error);
+                showError(error.message);
+            }
+        });
+
+        // Handle profile image upload
+        document.getElementById('avatarInput').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            try {
+                const user = auth.currentUser;
+                if (!user) throw new Error('Please sign in');
+
+                // Show loading
+                Swal.fire({
+                    title: 'Uploading...',
+                    text: 'Please wait while we upload your photo',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    willOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                // Upload image
+                const storageRef = ref(storage, `profile_images/${user.uid}`);
+                await uploadBytes(storageRef, file);
+                const photoURL = await getDownloadURL(storageRef);
+
+                // Update user profile
+                await updateDoc(doc(db, "users", user.uid), {
+                    photoURL: photoURL,
+                    updatedAt: new Date().toISOString()
+                });
+
+                // Update UI
+                document.getElementById('profileAvatar').src = photoURL;
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Photo Updated',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+
+            } catch (error) {
+                console.error("Error uploading image:", error);
+                showError(error.message);
+            }
+        });
+
+        // Handle logout
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                console.log("Attempting to log out...");
+                const result = await Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You will be logged out of your account.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#FF6B6B',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, logout'
+                });
+
+                if (result.isConfirmed) {
+                    await signOut(auth); // Sign out the user
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Logged Out',
+                        text: 'You have been successfully logged out.',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+
+                    // Redirect to the login page
+                    setTimeout(() => {
+                        window.location.href = '../home/signup.html';
+                    }, 1500);
+                }
+            } catch (error) {
+                console.error("Logout error:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while logging out. Please try again.'
+                });
+            }
+        });
+
+        // Show error message
+        function showError(message) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: message
+            });
+        }
+
+        // Initialize profile
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    // Check if user exists and is a volunteer
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    if (userDoc.exists() && userDoc.data().userType === 'volunteer') {
+                        loadProfileData();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Access Denied',
+                            text: 'You do not have volunteer privileges.',
+                            confirmButtonColor: '#FF6B6B'
+                        }).then(() => {
+                            window.location.href = '../home/signup.html';
+                        });
+                    }
+                } catch (error) {
+                    console.error("Error checking user role:", error);
+                    showError(error.message);
+                }
+            } else {
+                window.location.href = '../home/signup.html';
+            }
+        });
+
+        // Mobile menu toggle
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.createElement('button');
+            toggleBtn.className = 'btn btn-primary d-md-none position-fixed';
+            toggleBtn.style.cssText = 'top: 1rem; right: 1rem; z-index: 1001;';
+            toggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
+            document.body.appendChild(toggleBtn);
+
+            toggleBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('show');
+            });
+        });
+    </script>
+</body>
+</html>

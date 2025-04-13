@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Write Blog - V-Connect</title>    
+    <link rel="icon" href="../assets/v1.png" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.0-rc.2/dist/quill.snow.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/writeblogs.css">
+</head>
+
+<body>
+    <nav class="sidebar">
+        <a href="dashboard.html" class="sidebar-logo">
+            <i class="fas fa-hands-helping"></i>
+            <span>V-Connect</span>
+        </a>
+        <div class="nav flex-column">
+            <a href="../volunteer/dashboard.html" class="nav-link ">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a href="../volunteer/profile.html" class="nav-link">
+                <i class="fas fa-user"></i> Profile
+            </a>
+            <a href="../volunteer/opportunities.html" class="nav-link">
+                <i class="fas fa-search"></i> Find Opportunities
+            </a>
+            <a href="../volunteer/myevents.html" class="nav-link">
+                <i class="fas fa-calendar"></i> My Events
+            </a>
+            <a href="../volunteer/leaderboard.html" class="nav-link ">
+                <i class="fas fa-trophy"></i> Leaderboard
+            </a>
+            <a href="../home/writeblogs.html" class="nav-link active">
+                <i class="fas fa-blog"></i> Blogs
+            </a>
+            <a href="#" class="nav-link" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="blog-editor-container">
+            <h2 class="mb-4">Write a Blog Post</h2>
+
+            <form id="blogForm">
+                <div class="mb-3">
+                    <label class="form-label">Title</label>
+                    <input type="text" class="form-control" id="blogTitle" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Category</label>
+                    <select class="form-select" id="blogCategory" required>
+                        <option value="">Select a category</option>
+                        <option value="Volunteer Stories">Volunteer Stories</option>
+                        <option value="Event Experiences">Event Experiences</option>
+                        <option value="Impact Stories">Impact Stories</option>
+                        <option value="Tips & Advice">Tips & Advice</option>
+                        <option value="Community News">Community News</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Short Description</label>
+                    <textarea class="form-control" id="blogDescription" rows="3" required></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Content</label>
+                    <div id="editor"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Featured Image</label>
+                    <input type="file" class="form-control" id="blogImage" accept="image/*">
+                    <img id="imagePreview" class="image-preview d-none">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Tags</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="tagInput" placeholder="Add tags...">
+                        <button class="btn btn-outline-secondary" type="button" id="addTagBtn">Add</button>
+                    </div>
+                    <div class="tag-container" id="tagContainer"></div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-secondary" onclick="history.back()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Publish Blog</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Scripts -->
+     <script src="../config/firebaseConfig.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.0-rc.2/dist/quill.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="module">
+        import { initializeApp } 
+        from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import {
+            getAuth,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import {
+            getFirestore,
+            collection,
+            addDoc,
+            getDoc,
+            doc,
+            serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import {
+            getStorage,
+            ref,
+            uploadBytes,
+            getDownloadURL
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        async function getUserType(userId) {
+            try {
+                const organizerDoc = await getDoc(doc(db, "organizers", userId));
+                if (organizerDoc.exists()) {
+                    return 'organizer';
+                }
+
+                const volunteerDoc = await getDoc(doc(db, "users", userId));
+                if (volunteerDoc.exists()) {
+                    return 'volunteer';
+                }
+
+                return 'user'; 
+            } catch (error) {
+                console.error("Error getting user type:", error);
+                return 'user';
+            }
+        }
+        const quill = new Quill('#editor', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    ['link', 'image'],
+                    ['clean']
+                ]
+            }
+        });
+
+        const tags = new Set();
+        const tagInput = document.getElementById('tagInput');
+        const tagContainer = document.getElementById('tagContainer');
+        const addTagBtn = document.getElementById('addTagBtn');
+
+        addTagBtn.addEventListener('click', () => {
+            const tag = tagInput.value.trim();
+            if (tag && !tags.has(tag)) {
+                tags.add(tag);
+                renderTags();
+                tagInput.value = '';
+            }
+        });
+
+        function renderTags() {
+            tagContainer.innerHTML = '';
+            tags.forEach(tag => {
+                const tagElement = document.createElement('span');
+                tagElement.className = 'tag';
+                tagElement.innerHTML = `
+                    ${tag}
+                    <button type="button" onclick="removeTag('${tag}')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                tagContainer.appendChild(tagElement);
+            });
+        }
+        window.removeTag = function (tag) {
+            tags.delete(tag);
+            renderTags();
+        };
+
+        document.getElementById('blogImage').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const preview = document.getElementById('imagePreview');
+                    preview.src = e.target.result;
+                    preview.classList.remove('d-none');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('blogForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            try {
+                document.getElementById('loadingOverlay').style.display = 'flex';
+
+                const user = auth.currentUser;
+                if (!user) throw new Error('Please sign in to publish a blog');
+
+                const userType = await getUserType(user.uid);
+
+                let imageUrl = null;
+                const imageFile = document.getElementById('blogImage').files[0];
+                if (imageFile) {
+                    const storageRef = ref(storage, `blog-images/${Date.now()}_${imageFile.name}`);
+                    await uploadBytes(storageRef, imageFile);
+                    imageUrl = await getDownloadURL(storageRef);
+                }
+                const userDoc = await getDoc(doc(db, userType === 'organizer' ? 'organizers' : 'users', user.uid));
+                const userData = userDoc.data();
+
+                const blogData = {
+                    title: document.getElementById('blogTitle').value,
+                    category: document.getElementById('blogCategory').value,
+                    description: document.getElementById('blogDescription').value,
+                    content: quill.root.innerHTML,
+                    imageUrl,
+                    tags: Array.from(tags),
+                    author: userData?.displayName || user.displayName || 'Anonymous',
+                    authorId: user.uid,
+                    authorType: userType, 
+                    authorPhoto: userData?.photoURL || user.photoURL,
+                    createdAt: serverTimestamp(),
+                    likes: 0,
+                    comments: [],
+                    status: 'published'
+                };
+
+                if (!blogData.title || !blogData.category || !blogData.description || !blogData.content) {
+                    throw new Error('Please fill in all required fields');
+                }
+
+                const docRef = await addDoc(collection(db, "blogs"), blogData);
+
+                await addDoc(collection(db, `${userType}s/${user.uid}/blogs`), {
+                    blogId: docRef.id,
+                    createdAt: serverTimestamp()
+                });
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Blog Published!',
+                    text: 'Your blog post has been published successfully.',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    window.location.href = 'blog.html';
+                });
+
+            } catch (error) {
+                console.error("Error publishing blog:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'Failed to publish blog'
+                });
+            } finally {
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+        });
+
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        function validateForm() {
+            const title = document.getElementById('blogTitle').value;
+            const category = document.getElementById('blogCategory').value;
+            const description = document.getElementById('blogDescription').value;
+            const content = quill.root.innerHTML;
+
+            if (!title || !category || !description || !content) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Please fill in all required fields'
+                });
+                return false;
+            }
+            return true;
+        }
+        let autoSaveTimeout;
+        const autoSave = (content) => {
+            clearTimeout(autoSaveTimeout);
+            autoSaveTimeout = setTimeout(async () => {
+                try {
+                    const user = auth.currentUser;
+                    if (!user) return;
+
+                    const draftData = {
+                        title: document.getElementById('blogTitle').value,
+                        category: document.getElementById('blogCategory').value,
+                        description: document.getElementById('blogDescription').value,
+                        content: content,
+                        lastSaved: new Date().toISOString()
+                    };
+
+                    localStorage.setItem('blogDraft_' + user.uid, JSON.stringify(draftData));
+                } catch (error) {
+                    console.error("Error auto-saving:", error);
+                }
+            }, 1000);
+        };
+        const loadDraft = () => {
+            try {
+                const user = auth.currentUser;
+                if (!user) return;
+
+                const draft = localStorage.getItem('blogDraft_' + user.uid);
+                if (draft) {
+                    const draftData = JSON.parse(draft);
+                    document.getElementById('blogTitle').value = draftData.title || '';
+                    document.getElementById('blogCategory').value = draftData.category || '';
+                    document.getElementById('blogDescription').value = draftData.description || '';
+                    quill.root.innerHTML = draftData.content || '';
+
+                    Swal.fire({
+                        title: 'Draft Found',
+                        text: 'Would you like to restore your last saved draft?',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, restore it',
+                        cancelButtonText: 'No, start fresh'
+                    }).then((result) => {
+                        if (!result.isConfirmed) {
+                            localStorage.removeItem('blogDraft_' + user.uid);
+                            document.getElementById('blogForm').reset();
+                            quill.root.innerHTML = '';
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error("Error loading draft:", error);
+            }
+        };
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                loadDraft();
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+
+        quill.on('text-change', function () {
+            autoSave(quill.root.innerHTML);
+        });
+        onAuthStateChanged(auth, user => {
+            if (!user) {
+                window.location.href = 'signup.html';
+            }
+        });
+    </script>
+</body>
+
+</html>

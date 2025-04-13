@@ -1,0 +1,264 @@
+ 
+      :root {
+    --primary-color: #FF6B6B;      /* Warm Red */
+    --secondary-color: #4ECDC4;    /* Teal */
+    --accent-color: #FFE66D;       /* Yellow */
+    --dark: #2C3E50;               /* Dark Blue */
+    --light: #FFFFFF;
+    --gray-100: #F7F9FC;
+    --gray-200: #E9ECEF;
+    --gray-300: #DEE2E6;
+    --text-dark: #1A202C;
+    --text-light: #FFFFFF;
+    --gradient-primary: linear-gradient(135deg, #FF6B6B, #FF8E8E);
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+    --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+}
+
+/* Base Styles */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--gray-100);
+    color: var(--text-dark);
+    line-height: 1.6;
+    padding-top: 80px;
+}
+.navbar {
+    background-color: var(--light);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 1rem 0;
+}
+
+.navbar-brand {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.nav-link {
+    color: var(--text-dark);
+    font-weight: 500;
+    margin: 0 0.5rem;
+}
+
+.nav-link.btn-primary {
+    color: var(--light);
+    padding: 0.5rem 1.5rem;
+    border-radius: 25px;
+    background: var(--gradient-primary);
+    border: none;
+}
+
+
+/* Modern Header */
+.opportunity-header {
+    background: var(--light);
+    padding: 120px 0 80px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.opportunity-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--gradient-primary);
+    opacity: 0.05;
+}
+
+.opportunity-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+}
+
+.opportunity-subtitle {
+    font-size: 1.25rem;
+    color: var(--text-dark);
+    opacity: 0.8;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Enhanced Search Section */
+.filter-section {
+    background: var(--light);
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: var(--shadow-lg);
+    margin: -50px auto 50px;
+    position: relative;
+    z-index: 10;
+    max-width: 1000px;
+}
+
+.search-form .input-group {
+    border-radius: 50px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.search-form .form-control {
+    border: none;
+    padding: 1.2rem 1.5rem;
+    font-size: 1rem;
+}
+
+.search-form .btn-primary {
+    padding: 1.2rem 2rem;
+    border-radius: 0 50px 50px 0;
+    background: var(--gradient-primary);
+}
+
+/* Modern Filter Buttons */
+.filter-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+}
+
+.filter-btn {
+    padding: 0.8rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    background: var(--gray-100);
+    color: var(--text-dark);
+    border: none;
+}
+
+.filter-btn:hover,
+.filter-btn.active {
+    background: var(--gradient-primary);
+    color: var(--light);
+    transform: translateY(-2px);
+}
+
+/* Opportunity Cards */
+.opportunity-card {
+    background: var(--light);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+    margin-bottom: 2rem;
+}
+
+.opportunity-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.opportunity-image {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+}
+
+.opportunity-content {
+    padding: 2rem;
+}
+
+.category-badge {
+    background: var(--gray-100);
+    color: var(--primary-color);
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    display: inline-block;
+}
+
+.opportunity-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-dark);
+}
+
+.opportunity-meta {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-dark);
+    opacity: 0.8;
+    font-size: 0.875rem;
+}
+
+.meta-item i {
+    color: var(--primary-color);
+}
+
+/* Apply Button */
+.apply-btn {
+    background: var(--gradient-primary);
+    color: var(--light);
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: none;
+    display: inline-block;
+}
+
+.apply-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+.footer {
+    background: var(--gray-100);
+    padding: 4rem 0 2rem;
+}
+
+.footer h5 {
+    color: var(--text-dark);
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.footer p {
+    color: var(--text-dark);
+    opacity: 0.7;
+}
+
+.footer .list-unstyled li {
+    margin-bottom: 0.75rem;
+}
+
+.footer .list-unstyled a {
+    color: var(--text-dark);
+    opacity: 0.7;
+    text-decoration: none;
+    transition: opacity 0.3s ease;
+}
+
+.footer .list-unstyled a:hover {
+    opacity: 1;
+}
+
+.footer .social-links {
+    margin-top: 1rem;
+}
+
+.footer .social-links a {
+    margin-right: 1rem;
+}
+
+.footer hr {
+    border-color: var(--gray-300);
+}
+

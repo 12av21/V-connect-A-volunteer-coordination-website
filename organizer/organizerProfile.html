@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizer Profile - V-Connect</title>
+    <link rel="icon" href="../assets/v1.png" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/organizer/organizerProfile.css">
+</head>
+
+<body>
+    <button id="mobileMenuToggle" class="btn btn-primary d-md-none position-fixed"
+        style="top: 1rem; right: 1rem; z-index: 1001;">
+        <i class="fas fa-bars"></i>
+    </button>
+    <nav class="sidebar">
+        <a href="organizerDashboard.html" class="sidebar-logo">
+            <i class="fas fa-hands-helping"></i>
+            <span>V-Connect</span>
+        </a>
+        <div class="nav flex-column">
+            <a href="organizerDashboard.html" class="nav-link active">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a href="organizerProfile.html" class="nav-link">
+                <i class="fas fa-user"></i> Profile
+            </a>
+            <a href="createEvent.html" class="nav-link">
+                <i class="fas fa-calendar-plus"></i> Create Event
+            </a>
+            <a href="manageEvents.html" class="nav-link">
+                <i class="fas fa-tasks"></i> Manage Events
+            </a>
+            <a href="manageVolunteers.html" class="nav-link">
+                <i class="fas fa-users"></i> Manage Volunteers
+            </a>
+            <a href="eventCompletion.html" class="nav-link">
+                <i class="fas fa-check-circle"></i> Event Completion
+            </a>
+            <a href="../home/writeblogs.html" class="nav-link">
+                <i class="fas fa-blog"></i> Blogs
+            </a>
+            <a href="#" class="nav-link" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </nav>
+    <div class="main-content">
+        <div class="container">
+            <div class="profile-header">
+                <div class="row align-items-center">
+                    <div class="col-md-3 text-center">
+                        <div class="profile-avatar-wrapper">
+                            <img src="default-avatar.png" alt="Profile" class="profile-avatar" id="profileAvatar">
+                            <button class="change-photo-btn" onclick="document.getElementById('avatarInput').click()">
+                                <i class="fas fa-camera"></i>
+                            </button>
+                            <input type="file" id="avatarInput" hidden accept="image/*">
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <h2 id="organizerName" class="mb-1">Loading...</h2>
+                        <p class="text-muted mb-3" id="organizerEmail">loading@example.com</p>
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <h4 id="totalEvents">0</h4>
+                                <p class="mb-0">Total Events</p>
+                            </div>
+                            <div class="stat-item">
+                                <h4 id="activeVolunteers">0</h4>
+                                <p class="mb-0">Active Volunteers</p>
+                            </div>
+                            <div class="stat-item">
+                                <h4 id="completedEvents">0</h4>
+                                <p class="mb-0">Completed Events</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Profile Form -->
+            <div class="profile-form">
+                <form id="profileForm">
+                    <div class="profile-section">
+                        <h3 class="profile-section-title">Personal Information</h3>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="fullName" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Organization Name</label>
+                                <input type="text" class="form-control" id="organizationName" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Website</label>
+                                <input type="url" class="form-control" id="website">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="profile-section">
+                        <h3 class="profile-section-title">Organization Details</h3>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label">About Organization</label>
+                                <textarea class="form-control" id="about" rows="4"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Address</label>
+                                <input type="text" class="form-control" id="address">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">City</label>
+                                <input type="text" class="form-control" id="city">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="profile-section">
+                        <h3 class="profile-section-title">Social Media</h3>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Facebook</label>
+                                <input type="url" class="form-control" id="facebook">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Twitter</label>
+                                <input type="url" class="form-control" id="twitter">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">LinkedIn</label>
+                                <input type="url" class="form-control" id="linkedin">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Instagram</label>
+                                <input type="url" class="form-control" id="instagram">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Firebase Scripts -->
+     <script src="../config/firebaseConfig.js"></script>
+    <script type="module">// Firebase Imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            getDoc, 
+            updateDoc, 
+            collection, 
+            query, 
+            where, 
+            getDocs,
+            addDoc 
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { 
+            getStorage, 
+            ref, 
+            uploadBytes, 
+            getDownloadURL 
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+        
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+        
+        // DOM Elements
+        const elements = {
+            profileForm: document.getElementById('profileForm'),
+            avatarInput: document.getElementById('avatarInput'),
+            profileAvatar: document.getElementById('profileAvatar'),
+            organizerName: document.getElementById('organizerName'),
+            organizerEmail: document.getElementById('organizerEmail'),
+            fullName: document.getElementById('fullName'),
+            organizationName: document.getElementById('organizationName'),
+            phone: document.getElementById('phone'),
+            website: document.getElementById('website'),
+            about: document.getElementById('about'),
+            address: document.getElementById('address'),
+            city: document.getElementById('city'),
+            facebook: document.getElementById('facebook'),
+            twitter: document.getElementById('twitter'),
+            linkedin: document.getElementById('linkedin'),
+            instagram: document.getElementById('instagram'),
+            totalEvents: document.getElementById('totalEvents'),
+            activeVolunteers: document.getElementById('activeVolunteers'),
+            completedEvents: document.getElementById('completedEvents'),
+            notificationBadge: document.getElementById('notificationBadge')
+        };
+        
+        // Notification System
+        const notifications = {
+            async send(userId, title, message, type) {
+                try {
+                    await addDoc(collection(db, "notifications"), {
+                        userId,
+                        title,
+                        message,
+                        type,
+                        read: false,
+                        createdAt: new Date().toISOString()
+                    });
+                    await this.checkUnread(userId);
+                } catch (error) {
+                    console.error("Error sending notification:", error);
+                }
+            },
+        
+            async sendProfileUpdate(userId, updateType) {
+                const messages = {
+                    photo: 'Your profile photo has been updated successfully.',
+                    info: 'Your profile information has been updated successfully.'
+                };
+                await this.send(userId, 'Profile Updated', messages[updateType], 'profile_update');
+            },
+        
+            async checkUnread(userId) {
+                try {
+                    const snapshot = await getDocs(query(
+                        collection(db, "notifications"),
+                        where("userId", "==", userId),
+                        where("read", "==", false)
+                    ));
+                    
+                    elements.notificationBadge.textContent = snapshot.size;
+                    elements.notificationBadge.style.display = snapshot.size > 0 ? 'flex' : 'none';
+                } catch (error) {
+                    console.error("Error checking notifications:", error);
+                }
+            }
+        };
+        
+        // Profile Management
+        const profile = {
+            async load() {
+                try {
+                    const user = auth.currentUser;
+                    if (!user) throw new Error('Please sign in');
+        
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    if (!userDoc.exists()) throw new Error('Profile not found');
+        
+                    const userData = userDoc.data();
+                    this.updateUI(userData, user);
+                    await this.loadStatistics(user.uid);
+                } catch (error) {
+                    this.handleError(error);
+                }
+            },
+        
+            updateUI(userData, user) {
+                elements.organizerName.textContent = userData.name || 'No Name';
+                elements.organizerEmail.textContent = user.email;
+                elements.fullName.value = userData.name || '';
+                elements.organizationName.value = userData.organizationName || '';
+                elements.phone.value = userData.phone || '';
+                elements.website.value = userData.website || '';
+                elements.about.value = userData.about || '';
+                elements.address.value = userData.address || '';
+                elements.city.value = userData.city || '';
+        
+                if (userData.social) {
+                    elements.facebook.value = userData.social.facebook || '';
+                    elements.twitter.value = userData.social.twitter || '';
+                    elements.linkedin.value = userData.social.linkedin || '';
+                    elements.instagram.value = userData.social.instagram || '';
+                }
+        
+                if (userData.photoURL) {
+                    elements.profileAvatar.src = userData.photoURL;
+                }
+            },
+        
+            async loadStatistics(userId) {
+                const eventsSnapshot = await getDocs(query(
+                    collection(db, "events"),
+                    where("organizerId", "==", userId)
+                ));
+        
+                let totalEvents = 0;
+                let completedEvents = 0;
+                eventsSnapshot.forEach(doc => {
+                    totalEvents++;
+                    if (doc.data().status === 'completed') completedEvents++;
+                });
+        
+                const volunteersSnapshot = await getDocs(query(
+                    collection(db, "registrations"),
+                    where("eventOrganizerId", "==", userId),
+                    where("status", "==", "approved")
+                ));
+        
+                elements.totalEvents.textContent = totalEvents;
+                elements.activeVolunteers.textContent = volunteersSnapshot.size;
+                elements.completedEvents.textContent = completedEvents;
+            },
+        
+            handleError(error) {
+                console.error("Profile error:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message
+                });
+            }
+        };
+        
+        // Event Listeners
+        async function handleProfileSubmit(e) {
+            e.preventDefault();
+            try {
+                const user = auth.currentUser;
+                if (!user) throw new Error('Please sign in');
+        
+                const formData = {
+                    name: elements.fullName.value,
+                    organizationName: elements.organizationName.value,
+                    phone: elements.phone.value,
+                    website: elements.website.value,
+                    about: elements.about.value,
+                    address: elements.address.value,
+                    city: elements.city.value,
+                    social: {
+                        facebook: elements.facebook.value,
+                        twitter: elements.twitter.value,
+                        linkedin: elements.linkedin.value,
+                        instagram: elements.instagram.value
+                    },
+                    updatedAt: new Date().toISOString()
+                };
+        
+                await updateDoc(doc(db, "users", user.uid), formData);
+                await notifications.sendProfileUpdate(user.uid, 'info');
+        
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Profile Updated',
+                    text: 'Your profile has been updated successfully!',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+        
+                await profile.load();
+            } catch (error) {
+                profile.handleError(error);
+            }
+        }
+        
+        async function handleAvatarChange(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+        
+            try {
+                const user = auth.currentUser;
+                if (!user) throw new Error('Please sign in');
+        
+                await Swal.fire({
+                    title: 'Uploading...',
+                    text: 'Please wait while we upload your photo',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    didOpen: () => Swal.showLoading()
+                });
+        
+                const storageRef = ref(storage, `profile_images/${user.uid}`);
+                await uploadBytes(storageRef, file);
+                const photoURL = await getDownloadURL(storageRef);
+        
+                await updateDoc(doc(db, "users", user.uid), {
+                    photoURL,
+                    updatedAt: new Date().toISOString()
+                });
+        
+                await notifications.sendProfileUpdate(user.uid, 'photo');
+                elements.profileAvatar.src = photoURL;
+        
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'Profile photo updated successfully!',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            } catch (error) {
+                profile.handleError(error);
+            }
+        }
+        
+        // Initialize
+        function init() {
+            elements.profileForm.addEventListener('submit', handleProfileSubmit);
+            elements.avatarInput.addEventListener('change', handleAvatarChange);
+        
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    try {
+                        const userDoc = await getDoc(doc(db, "users", user.uid));
+                        if (userDoc.exists() && userDoc.data().userType === 'organizer') {
+                            await profile.load();
+                            await notifications.checkUnread(user.uid);
+                        } else {
+                            throw new Error('You do not have organizer privileges.');
+                        }
+                    } catch (error) {
+                        await Swal.fire({
+                            icon: 'error',
+                            title: 'Access Denied',
+                            text: error.message,
+                            confirmButtonColor: '#FF6B6B'
+                        });
+                        window.location.href = '/home/signup.html';
+                    }
+                } else {
+                    window.location.href = '/home/signup.html';
+                }
+            });
+        }
+        
+        // Start the application
+        init();
+        
+    </script>
+    </body>
+</html>

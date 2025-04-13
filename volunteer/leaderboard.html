@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volunteer Leaderboard - V-Connect</title>
+   
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/volunteer/leaderboard.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <a href="dashboard.html" class="sidebar-logo">
+            <i class="fas fa-hands-helping"></i>
+            <span>V-Connect</span>
+        </a>
+        <div class="nav flex-column">
+            <a href="dashboard.html" class="nav-link">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a href="profile.html" class="nav-link">
+                <i class="fas fa-user"></i> Profile
+            </a>
+            <a href="opportunities.html" class="nav-link">
+                <i class="fas fa-search"></i> Find Opportunities
+            </a>
+            <a href="myevents.html" class="nav-link">
+                <i class="fas fa-calendar"></i> My Events
+            </a>
+            <a href="leaderboard.html" class="nav-link active">
+                <i class="fas fa-trophy"></i> Leaderboard
+            </a>
+            <a href="#" class="nav-link" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </nav>
+    <div class="main-content">
+        <div class="container-fluid">
+            <div class="leaderboard-header">
+                <h1><i class="fas fa-trophy"></i> Volunteer Leaderboard</h1>
+                <p>Recognizing our most active and dedicated volunteers</p>
+            </div>
+            <div class="filters-section">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" class="form-control" id="searchInput" placeholder="Search volunteers...">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="timeFilter">
+                            <option value="all-time">All Time</option>
+                            <option value="this-month">This Month</option>
+                            <option value="this-week">This Week</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="categoryFilter">
+                            <option value="all">All Categories</option>
+                            <option value="hours">Hours Contributed</option>
+                            <option value="events">Events Attended</option>
+                            <option value="points">Points Earned</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary w-100" id="refreshBtn">
+                            <i class="fas fa-sync-alt me-2"></i>Refresh
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div id="leaderboardList">
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+     <script src="../config/firebaseConfig.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, query, where, getDocs, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        let volunteers = [];
+        async function loadLeaderboard() {
+            try {
+                showLoading();
+                const usersRef = collection(db, "users");
+                const q = query(
+                    usersRef,
+                    where("userType", "==", "volunteer"),
+                    orderBy("totalPoints", "desc"),
+                    limit(50)
+                );
+
+                const snapshot = await getDocs(q);
+                volunteers = snapshot.docs.map((doc, index) => ({
+                    id: doc.id,
+                    rank: index + 1,
+                    ...doc.data()
+                }));
+
+                renderLeaderboard(volunteers);
+            } catch (error) {
+                console.error("Error loading leaderboard:", error);
+                showError("Failed to load leaderboard data");
+            }
+        }
+
+        function showLoading() {
+            const leaderboardList = document.getElementById('leaderboardList');
+            leaderboardList.innerHTML = `
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-3">Loading leaderboard...</p>
+                </div>
+            `;
+        }
+
+        function showError(message) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: message,
+                timer: 3000,
+                showConfirmButton: false
+            });
+        }
+
+        function getRankClass(rank) {
+            if (rank === 1) return 'rank-1';
+            if (rank === 2) return 'rank-2';
+            if (rank === 3) return 'rank-3';
+            return 'bg-secondary';
+        }
+
+        function renderLeaderboard(volunteers) {
+            const leaderboardList = document.getElementById('leaderboardList');
+            leaderboardList.innerHTML = volunteers.map(volunteer => `
+                <div class="leaderboard-card">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <div class="rank-badge ${getRankClass(volunteer.rank)}">
+                                ${volunteer.rank}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <img src="${volunteer.photoURL || 'default-avatar.png'}" 
+                                 alt="${volunteer.name}" 
+                                 class="volunteer-avatar">
+                        </div>
+                        <div class="col">
+                            <h5 class="mb-1">${volunteer.name}</h5>
+                            <div class="stats-mini">
+                                <div class="stat-item">
+                                    <i class="fas fa-clock text-primary"></i>
+                                    ${volunteer.totalHours || 0} Hours
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fas fa-calendar-check text-success"></i>
+                                    ${volunteer.eventsAttended || 0} Events
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fas fa-star text-warning"></i>
+                                    ${volunteer.totalPoints || 0} Points
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                ${renderBadges(volunteer.badges || [])}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderBadges(badges) {
+            return badges.map(badge => `
+                <span class="achievement-badge bg-light">
+                    <i class="fas fa-medal text-primary me-1"></i>
+                    ${badge}
+                </span>
+            `).join('');
+        }
+
+        function filterVolunteers() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const timeFilter = document.getElementById('timeFilter').value;
+            const categoryFilter = document.getElementById('categoryFilter').value;
+
+            let filtered = [...volunteers];
+
+            if (searchTerm) {
+                filtered = filtered.filter(v => 
+                    v.name.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            if (timeFilter !== 'all-time') {
+            }
+
+            if (categoryFilter !== 'all') {
+                filtered.sort((a, b) => {
+                    switch(categoryFilter) {
+                        case 'hours':
+                            return (b.totalHours || 0) - (a.totalHours || 0);
+                        case 'events':
+                            return (b.eventsAttended || 0) - (a.eventsAttended || 0);
+                        case 'points':
+                            return (b.totalPoints || 0) - (a.totalPoints || 0);
+                        default:
+                            return 0;
+                    }
+                });
+            }
+
+            filtered = filtered.map((v, index) => ({
+                ...v,
+                rank: index + 1
+            }));
+
+            renderLeaderboard(filtered);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('searchInput').addEventListener('input', filterVolunteers);
+            document.getElementById('timeFilter').addEventListener('change', filterVolunteers);
+            document.getElementById('categoryFilter').addEventListener('change', filterVolunteers);
+            document.getElementById('refreshBtn').addEventListener('click', loadLeaderboard);
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                console.log("Attempting to log out...");
+                const result = await Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You will be logged out of your account.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#FF6B6B',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, logout'
+                });
+
+                if (result.isConfirmed) {
+                    await signOut(auth); 
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Logged Out',
+                        text: 'You have been successfully logged out.',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+
+                    setTimeout(() => {
+                        window.location.href = '../home/signup.html';
+                    }, 1500);
+                }
+            } catch (error) {
+                console.error("Logout error:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while logging out. Please try again.'
+                });
+            }
+        });
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                loadLeaderboard();
+            } else {
+                window.location.href = '../home/signup.html';
+            }
+        });
+    </script>
+</body>
+</html>
