@@ -138,7 +138,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: url('../assets/main.jpg') no-repeat center center/cover;
+      background: url('./assets/main.jpg') no-repeat center center/cover;
       filter: brightness(50%);
       /* Darkens the image to make text pop */
       z-index: 0;
