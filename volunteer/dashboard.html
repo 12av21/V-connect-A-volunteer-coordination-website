@@ -7,14 +7,15 @@
     <title>Volunteer Dashboard - V-Connect</title>
     <link rel="icon" href="../assets/v1.png" type="image/png">
 
+    <!-- Stylesheets -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/volunteer/dashboard.css">
+
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="../css//volunteer/dashboard.css">
-
-
 </head>
 
 <body>
@@ -23,6 +24,7 @@
         <i class="fas fa-bars"></i>
     </button>
 
+    <!-- Sidebar -->
     <nav class="sidebar">
         <a href="dashboard.html" class="sidebar-logo">
             <i class="fas fa-hands-helping"></i>
@@ -41,10 +43,10 @@
             <a href="myevents.html" class="nav-link">
                 <i class="fas fa-calendar"></i> My Events
             </a>
-            <a href="leaderboard.html" class="nav-link ">
+            <a href="leaderboard.html" class="nav-link">
                 <i class="fas fa-trophy"></i> Leaderboard
             </a>
-            <a href="../home/writeblogs.html" class="nav-link ">
+            <a href="../home/writeblogs.html" class="nav-link">
                 <i class="fas fa-blog"></i> Blogs
             </a>
             <a href="#" class="nav-link" id="logoutBtn">
@@ -52,6 +54,8 @@
             </a>
         </div>
     </nav>
+
+    <!-- Main Content -->
     <div class="main-content">
         <div class="container-fluid">
             <div class="d-flex justify-content-between align-items-center mb-4">
@@ -63,23 +67,25 @@
                     <i class="fas fa-sync-alt me-2"></i>Refresh
                 </button>
             </div>
+
+            <!-- Stats Section -->
             <div class="row g-4">
                 <div class="col-md-3">
                     <div class="stats-card text-center">
                         <div class="stats-icon bg-primary bg-opacity-10 text-primary">
-                            <i class="fas fa-clock"></i>
+                            <i class="fas fa-calendar-check"></i>
                         </div>
-                        <div class="stats-value" id="totalHours">0</div>
-                        <div class="stats-label">Volunteer Hours</div>
+                        <div class="stats-value" id="eventsAttended">0</div>
+                        <div class="stats-label">Events Attended</div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="stats-card text-center">
                         <div class="stats-icon bg-success bg-opacity-10 text-success">
-                            <i class="fas fa-calendar-check"></i>
+                            <i class="fas fa-check-circle"></i>
                         </div>
-                        <div class="stats-value" id="eventsAttended">0</div>
-                        <div class="stats-label">Events Attended</div>
+                        <div class="stats-value" id="completedEvents">0</div>
+                        <div class="stats-label">Completed Events</div>
                     </div>
                 </div>
                 <div class="col-md-3">
@@ -101,7 +107,41 @@
                     </div>
                 </div>
             </div>
-            <div class="quick-actions">
+
+            <!-- Badges Section -->
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">
+                        <i class="fas fa-award me-2"></i>
+                        Your Badges
+                        <small class="text-muted ms-2">
+                            (<span id="badgesEarned">0</span> earned)
+                        </small>
+                    </h4>
+                    <div class="badges-container" id="badgesContainer">
+                        <!-- Badges will be inserted here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="chart-card">
+                        <h4>Events Overview</h4>
+                        <canvas id="eventsChart"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="chart-card">
+                        <h4>Impact Overview</h4>
+                        <canvas id="impactChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions mt-4">
                 <div class="action-card" onclick="window.location.href='opportunities.html'">
                     <i class="fas fa-search fa-2x mb-3"></i>
                     <h5>Find Events</h5>
@@ -115,20 +155,8 @@
                     <h5>Certificates</h5>
                 </div>
             </div>
-            <div class="row mt-4">
-                <div class="col-md-6">
-                    <div class="chart-card">
-                        <h4>Volunteer Hours</h4>
-                        <canvas id="hoursChart"></canvas>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="chart-card">
-                        <h4>Impact Overview</h4>
-                        <canvas id="impactChart"></canvas>
-                    </div>
-                </div>
-            </div>
+
+            <!-- Upcoming Events -->
             <div class="card mt-4">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -138,429 +166,277 @@
                         </a>
                     </div>
                     <div id="latestEvents">
+                        <!-- Upcoming events will be inserted here -->
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="leaderboard-section mt-4">
-            <div class="card">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0"><i class="fas fa-trophy"></i> Top Volunteers</h4>
-                    <button class="btn btn-light btn-sm" id="refreshLeaderboard">
-                        <i class="fas fa-sync-alt"></i> Refresh
-                    </button>
-                </div>
-                <div class="card-body">
-                    <div class="top-volunteers mb-4">
-                        <div class="row g-3" id="topThree">
-                        </div>
+            <!-- Leaderboard Section -->
+            <div class="leaderboard-section mt-4">
+                <div class="card">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0"><i class="fas fa-trophy"></i> Top Volunteers</h4>
+                        <button class="btn btn-light btn-sm" id="refreshLeaderboard">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
                     </div>
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Rank</th>
-                                    <th>Volunteer</th>
-                                    <th>Hours</th>
-                                    <th>Events</th>
-                                    <th>Points</th>
-                                    <th>Achievements</th>
-                                </tr>
-                            </thead>
-                            <tbody id="leaderboardTable">
-                            </tbody>
-                        </table>
+                    <div class="card-body">
+                        <div class="top-volunteers mb-4">
+                            <div class="row g-3" id="topThree">
+                                <!-- Top 3 volunteers will be inserted here -->
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Volunteer</th>
+                                        <th>Hours</th>
+                                        <th>Events</th>
+                                        <th>Points</th>
+                                        <th>Achievements</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="leaderboardTable">
+                                    <!-- Leaderboard data will be inserted here -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
     <!-- Scripts -->
     <script src="../config/firebaseConfig.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
-        // Firebase Imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import {
-            getFirestore,
-            doc,
-            getDoc,
-            collection,
-            query,
-            where,
-            getDocs,
-            orderBy,
-            limit
+        import { getAuth, onAuthStateChanged, signOut
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import {getFirestore, collection, query, where, getDocs
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
         // DOM Elements
-        const elements = {
-            volunteerName: document.getElementById('volunteerName'),
-            totalHours: document.getElementById('totalHours'),
-            eventsAttended: document.getElementById('eventsAttended'),
-            totalPoints: document.getElementById('totalPoints'),
-            badgesEarned: document.getElementById('badgesEarned'),
-            latestEvents: document.getElementById('latestEvents'),
-            hoursChart: document.getElementById('hoursChart'),
-            impactChart: document.getElementById('impactChart'),
-            topThree: document.getElementById('topThree'),
-            leaderboardTable: document.getElementById('leaderboardTable'),
-            refreshBtn: document.getElementById('refreshBtn'),
-            refreshLeaderboard: document.getElementById('refreshLeaderboard'),
-            logoutBtn: document.getElementById('logoutBtn')
-        };
+        const volunteerName = document.getElementById("volunteerName");
+        const eventsAttended = document.getElementById("eventsAttended");
+        const completedEvents = document.getElementById("completedEvents");
+        const totalPoints = document.getElementById("totalPoints");
+        const badgesEarned = document.getElementById("badgesEarned");
+        const badgesContainer = document.getElementById("badgesContainer");
+        const latestEvents = document.getElementById("latestEvents");
+        const topThree = document.getElementById("topThree");
+        const leaderboardTable = document.getElementById("leaderboardTable");
 
-        // Chart Management
-        const charts = {
-            async initialize() {
-                try {
-                    const user = auth.currentUser;
-                    if (!user) return;
+        // Charts
+        let eventsChart, impactChart;
 
-                    const hoursData = await this.getHoursData(user.uid);
-                    const impactData = await this.getImpactData(user.uid);
-
-                    this.createHoursChart(hoursData);
-                    this.createImpactChart(impactData);
-                } catch (error) {
-                    console.error("Error initializing charts:", error);
-                }
-            },
-
-            async getHoursData(userId) {
-                const sixMonthsAgo = new Date();
-                sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-
-                const hoursSnapshot = await getDocs(query(
-                    collection(db, "volunteerHours"),
-                    where("userId", "==", userId),
-                    where("date", ">=", sixMonthsAgo.toISOString()),
-                    orderBy("date", "desc")
-                ));
-
-                const monthlyHours = new Map();
-                const months = Array.from({ length: 6 }, (_, i) => {
-                    const date = new Date();
-                    date.setMonth(date.getMonth() - i);
-                    return date.toLocaleString('default', { month: 'short' });
-                }).reverse();
-
-                months.forEach(month => monthlyHours.set(month, 0));
-
-                hoursSnapshot.forEach(doc => {
-                    const data = doc.data();
-                    const month = new Date(data.date).toLocaleString('default', { month: 'short' });
-                    if (monthlyHours.has(month)) {
-                        monthlyHours.set(month, monthlyHours.get(month) + (data.hours || 0));
-                    }
-                });
-
-                return {
-                    labels: months,
-                    data: months.map(month => monthlyHours.get(month))
-                };
-            },
-
-            async getImpactData(userId) {
-                const eventsSnapshot = await getDocs(query(
-                    collection(db, "eventParticipants"),
-                    where("userId", "==", userId),
-                    where("status", "==", "completed")
-                ));
-
-                const categoryCount = new Map();
-                ['Education', 'Environment', 'Health', 'Community'].forEach(category =>
-                    categoryCount.set(category, 0)
-                );
-
-                for (const doc of eventsSnapshot.docs) {
-                    const eventDoc = await getDoc(doc(db, "events", doc.data().eventId));
-                    if (eventDoc.exists()) {
-                        const category = eventDoc.data().category || 'Other';
-                        categoryCount.set(category, (categoryCount.get(category) || 0) + 1);
-                    }
-                }
-
-                return {
-                    labels: Array.from(categoryCount.keys()),
-                    data: Array.from(categoryCount.values())
-                };
-            },
-
-            createHoursChart(data) {
-                const ctx = elements.hoursChart.getContext('2d');
-                const existingChart = Chart.getChart(ctx);
-                if (existingChart) existingChart.destroy();
-
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: data.labels,
-                        datasets: [{
-                            label: 'Volunteer Hours',
-                            data: data.data,
-                            borderColor: '#FF6B6B',
-                            tension: 0.4,
-                            fill: true,
-                            backgroundColor: 'rgba(255, 107, 107, 0.1)'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { position: 'top' }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: { stepSize: 5 }
-                            }
-                        }
-                    }
-                });
-            },
-
-            createImpactChart(data) {
-                const ctx = elements.impactChart.getContext('2d');
-                const existingChart = Chart.getChart(ctx);
-                if (existingChart) existingChart.destroy();
-
-                new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: data.labels,
-                        datasets: [{
-                            data: data.data,
-                            backgroundColor: ['#FF6B6B', '#4ECDC4', '#FFD93D', '#6C5CE7']
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { position: 'right' }
-                        }
-                    }
-                });
-            }
-        };
-
-        // Dashboard Functions
-        const dashboard = {
-            async loadVolunteerData() {
-                const user = auth.currentUser;
-                if (!user) return;
-
-                try {
-                    const userDoc = await getDoc(doc(db, "users", user.uid));
-                    if (userDoc.exists()) {
-                        const userData = userDoc.data();
-                        elements.volunteerName.textContent = userData.name || "Volunteer";
-                        elements.totalHours.textContent = userData.totalHours || 0;
-                        elements.eventsAttended.textContent = userData.eventsAttended || 0;
-                        elements.totalPoints.textContent = userData.totalPoints || 0;
-                        elements.badgesEarned.textContent = userData.badgesEarned || 0;
-                    }
-                } catch (error) {
-                    console.error("Error loading volunteer data:", error);
-                }
-            },
-
-            async loadLatestEvents() {
-                try {
-                    const user = auth.currentUser;
-                    if (!user) return;
-
-                    const today = new Date();
-                    const snapshot = await getDocs(query(
-                        collection(db, "events"),
-                        where("status", "==", "active"),
-                        where("date", ">=", today.toISOString()),
-                        orderBy("date", "asc"),
-                        limit(5)
-                    ));
-
-                    elements.latestEvents.innerHTML = snapshot.empty ?
-                        this.getEmptyEventsTemplate() :
-                        snapshot.docs.map(doc => this.getEventCardTemplate(doc.data())).join('');
-                } catch (error) {
-                    console.error("Error loading latest events:", error);
-                }
-            },
-
-            getEmptyEventsTemplate() {
-                return `
-            <div class="text-center py-4">
-                <i class="fas fa-calendar-alt fa-3x text-muted mb-3"></i>
-                <p class="text-muted">No upcoming events available</p>
-            </div>
-        `;
-            },
-
-            getEventCardTemplate(event) {
-                return `
-            <div class="card mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">${event.title}</h5>
-                    <p class="card-text text-muted">
-                        <i class="fas fa-calendar-alt me-2"></i>${new Date(event.date).toLocaleDateString()}
-                    </p>
-                    <p class="card-text text-muted">
-                        <i class="fas fa-map-marker-alt me-2"></i>${event.location || "Location not specified"}
-                    </p>
-                </div>
-            </div>
-        `;
-            }
-        };
-
-        // Event Listeners
-        function setupEventListeners() {
-            elements.refreshBtn.addEventListener('click', async () => {
-                try {
-                    await Promise.all([
-                        dashboard.loadVolunteerData(),
-                        dashboard.loadLatestEvents(),
-                        charts.initialize()
-                    ]);
-
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Dashboard Updated',
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
-                } catch (error) {
-                    console.error("Error refreshing dashboard:", error);
-                }
-            });
-
-            elements.logoutBtn.addEventListener('click', async () => {
-                try {
-                    const result = await Swal.fire({
-                        title: 'Are you sure?',
-                        text: "You will be logged out of your account.",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#FF6B6B',
-                        cancelButtonColor: '#6c757d',
-                        confirmButtonText: 'Yes, logout'
-                    });
-
-                    if (result.isConfirmed) {
-                        await signOut(auth);
-                        await Swal.fire({
-                            icon: 'success',
-                            title: 'Logged Out',
-                            text: 'You have been successfully logged out.',
-                            timer: 1500,
-                            showConfirmButton: false
-                        });
-                        window.location.href = '../home/signup.html';
-                    }
-                } catch (error) {
-                    console.error("Logout error:", error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'An error occurred while logging out. Please try again.'
-                    });
+        // Show loading spinner
+        function showLoading() {
+            Swal.fire({
+                title: "Loading...",
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
                 }
             });
         }
 
-        // Initialize
-        function init() {
-            setupEventListeners();
-
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    try {
-                        await Promise.all([
-                            dashboard.loadVolunteerData(),
-                            dashboard.loadLatestEvents(),
-                            charts.initialize()
-                        ]);
-                    } catch (error) {
-                        console.error("Dashboard initialization error:", error);
-                    }
-                } else {
-                    window.location.href = '../home/signup.html';
-                }
-            });
+        // Hide loading spinner
+        function hideLoading() {
+            Swal.close();
         }
 
-        document.getElementById('logoutBtn').addEventListener('click', async () => {
+        // Load volunteer stats
+        async function loadStats(userId) {
+            showLoading();
             try {
-                console.log("Attempting to log out...");
-                const result = await Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You will be logged out of your account.",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#FF6B6B',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Yes, logout'
-                });
+                // Fetch stats from Firestore
+                const statsQuery = query(collection(db, "stats"), where("userId", "==", userId));
+                const statsSnapshot = await getDocs(statsQuery);
 
-                if (result.isConfirmed) {
-                    await signOut(auth); // Sign out the user
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Logged Out',
-                        text: 'You have been successfully logged out.',
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
+                if (!statsSnapshot.empty) {
+                    const stats = statsSnapshot.docs[0].data();
+                    eventsAttended.textContent = stats.eventsAttended || 0;
+                    completedEvents.textContent = stats.completedEvents || 0;
+                    totalPoints.textContent = stats.totalPoints || 0;
+                    badgesEarned.textContent = stats.badgesEarned || 0;
 
-                    // Redirect to the login page
-                    setTimeout(() => {
-                        window.location.href = '../home/signup.html';
-                    }, 1500);
+                    // Load badges
+                    loadBadges(stats.badges || []);
                 }
             } catch (error) {
-                console.error("Logout error:", error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'An error occurred while logging out. Please try again.'
+                console.error("Error loading stats:", error);
+                Swal.fire("Error", "Failed to load stats. Please try again later.", "error");
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Load badges
+        function loadBadges(badges) {
+            badgesContainer.innerHTML = "";
+            if (badges.length === 0) {
+                badgesContainer.innerHTML = "<p class='text-muted'>No badges earned yet.</p>";
+                return;
+            }
+
+            badges.forEach((badge) => {
+                const badgeElement = document.createElement("div");
+                badgeElement.className = "badge-item";
+                badgeElement.innerHTML = `
+                    <img src="${badge.image}" alt="${badge.name}" class="badge-image">
+                    <p class="badge-name">${badge.name}</p>
+                `;
+                badgesContainer.appendChild(badgeElement);
+            });
+        }
+
+        // Load upcoming events
+        async function loadUpcomingEvents(userId) {
+            try {
+                const eventsQuery = query(
+                    collection(db, "events"),
+                    where("userId", "==", userId),
+                    where("status", "==", "upcoming")
+                );
+                const eventsSnapshot = await getDocs(eventsQuery);
+
+                latestEvents.innerHTML = "";
+                if (eventsSnapshot.empty) {
+                    latestEvents.innerHTML = "<p class='text-muted'>No upcoming events.</p>";
+                    return;
+                }
+
+                eventsSnapshot.forEach((doc) => {
+                    const event = doc.data();
+                    const eventElement = document.createElement("div");
+                    eventElement.className = "event-item";
+                    eventElement.innerHTML = `
+                        <h5>${event.title}</h5>
+                        <p class="text-muted">${new Date(event.date).toLocaleDateString()}</p>
+                    `;
+                    latestEvents.appendChild(eventElement);
                 });
+            } catch (error) {
+                console.error("Error loading upcoming events:", error);
+            }
+        }
+
+        // Load leaderboard
+        async function loadLeaderboard() {
+            try {
+                const leaderboardQuery = query(collection(db, "leaderboard"));
+                const leaderboardSnapshot = await getDocs(leaderboardQuery);
+
+                topThree.innerHTML = "";
+                leaderboardTable.innerHTML = "";
+
+                if (leaderboardSnapshot.empty) {
+                    topThree.innerHTML = "<p class='text-muted'>No leaderboard data available.</p>";
+                    return;
+                }
+
+                let rank = 1;
+                leaderboardSnapshot.forEach((doc) => {
+                    const volunteer = doc.data();
+
+                    if (rank <= 3) {
+                        const topVolunteer = document.createElement("div");
+                        topVolunteer.className = "col-md-4";
+                        topVolunteer.innerHTML = `
+                            <div class="top-volunteer-card">
+                                <img src="${volunteer.photo}" alt="${volunteer.name}" class="volunteer-avatar">
+                                <h5>${volunteer.name}</h5>
+                                <p class="text-muted">${volunteer.points} points</p>
+                            </div>
+                        `;
+                        topThree.appendChild(topVolunteer);
+                    }
+
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td>${rank}</td>
+                        <td>${volunteer.name}</td>
+                        <td>${volunteer.hours}</td>
+                        <td>${volunteer.events}</td>
+                        <td>${volunteer.points}</td>
+                        <td>${volunteer.achievements}</td>
+                    `;
+                    leaderboardTable.appendChild(row);
+
+                    rank++;
+                });
+            } catch (error) {
+                console.error("Error loading leaderboard:", error);
+            }
+        }
+
+        // Initialize charts
+        function initializeCharts() {
+            const eventsCtx = document.getElementById("eventsChart").getContext("2d");
+            const impactCtx = document.getElementById("impactChart").getContext("2d");
+
+            if (eventsChart) eventsChart.destroy();
+            if (impactChart) impactChart.destroy();
+
+            eventsChart = new Chart(eventsCtx, {
+                type: "bar",
+                data: {
+                    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+                    datasets: [
+                        {
+                            label: "Events Attended",
+                            data: [5, 10, 8, 6, 12, 9],
+                            backgroundColor: "rgba(54, 162, 235, 0.5)"
+                        }
+                    ]
+                }
+            });
+
+            impactChart = new Chart(impactCtx, {
+                type: "pie",
+                data: {
+                    labels: ["Education", "Environment", "Health"],
+                    datasets: [
+                        {
+                            data: [40, 30, 30],
+                            backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"]
+                        }
+                    ]
+                }
+            });
+        }
+
+        // Logout functionality
+        document.getElementById("logoutBtn").addEventListener("click", async () => {
+            try {
+                await signOut(auth);
+                Swal.fire("Logged Out", "You have been successfully logged out.", "success").then(() => {
+                    window.location.href = "../home/signup.html";
+                });
+            } catch (error) {
+                console.error("Error logging out:", error);
+                Swal.fire("Error", "Failed to log out. Please try again.", "error");
             }
         });
 
-        // Start the application
-        init();
-
-    </script>
-    <!-- JavaScript for Sidebar Toggle -->
-    <script>
-        // Toggle sidebar visibility on mobile menu button click
-        document.getElementById('mobileMenuToggle').addEventListener('click', () => {
-            document.querySelector('.sidebar').classList.toggle('show');
-        });
-
-        // Close sidebar when clicking outside of it
-        document.addEventListener('click', (e) => {
-            const sidebar = document.querySelector('.sidebar');
-            const toggle = document.getElementById('mobileMenuToggle');
-
-            if (!sidebar.contains(e.target) && e.target !== toggle) {
-                sidebar.classList.remove('show');
-            }
-        });
-
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 768) {
-                document.querySelector('.sidebar').classList.remove('show');
+        // On auth state change
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                volunteerName.textContent = user.displayName || "Volunteer";
+                loadStats(user.uid);
+                loadUpcomingEvents(user.uid);
+                loadLeaderboard();
+                initializeCharts();
+            } else {
+                window.location.href = "../home/signup.html";
             }
         });
     </script>

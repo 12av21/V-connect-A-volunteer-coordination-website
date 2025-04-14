@@ -263,3 +263,55 @@ body {
     .highlight-row {
         background-color: rgba(255, 107, 107, 0.1);
     }
+    .badges-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 1rem;
+        padding: 1rem 0;
+    }
+    
+    .badge-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1.5rem;
+        border-radius: 12px;
+        transition: transform 0.3s ease;
+        text-align: center;
+    }
+    
+    .badge-item:hover {
+        transform: translateY(-5px);
+    }
+    
+    .badge-name {
+        font-weight: 600;
+        margin-top: 0.5rem;
+    }
+    
+    .badge-description {
+        font-size: 0.875rem;
+        opacity: 0.8;
+    }
+    const defaultBadges = [
+        {
+            name: "Newcomer",
+            icon: "fas fa-star",
+            description: "Joined the community",
+            color: "#FFD700"
+        },
+        {
+            name: "First Event",
+            icon: "fas fa-calendar-check",
+            description: "Completed first event",
+            color: "#4ECDC4"
+        },
+        {
+            name: "Active Volunteer",
+            icon: "fas fa-hand-holding-heart",
+            description: "Participated in 5+ events",
+            color: "#FF6B6B"
+        }
+    ];
+        
