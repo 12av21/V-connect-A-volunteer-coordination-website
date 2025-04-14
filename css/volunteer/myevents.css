@@ -1,80 +1,80 @@
 :root {
-            --primary: #FF6B6B;
-            --secondary: #4ECDC4;
-            --dark: #2C3E50;
-            --light: #FFFFFF;
-            --gray-100: #F8F9FA;
-            --gray-200: #E9ECEF;
-            --gray-300: #DEE2E6;
-            --gradient: linear-gradient(135deg, #FF6B6B, #FF8E8E);
-            --shadow-md: 0 4px 6px rgba(0,0,0,.1);
-        }
+    --primary: #FF6B6B;
+    --secondary: #4ECDC4;
+    --dark: #2C3E50;
+    --light: #FFFFFF;
+    --gray-100: #F8F9FA;
+    --gray-200: #E9ECEF;
+    --gray-300: #DEE2E6;
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, .05);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, .1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, .1);
+    --gradient: linear-gradient(135deg, #FF6B6B, #FF8E8E);
+}
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: var(--gray-100);
-            color: var(--dark);
-        }
+body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--gray-100);
+    color: var(--dark);
+    line-height: 1.6;
+}
 
-        /* Sidebar Styles */
-        .sidebar {
-            position: fixed;
-            left: -250px; /* Hidden by default */
-            top: 0;
-            bottom: 0;
-            width: 250px;
-            background: var(--light);
-            box-shadow: var(--shadow-md);
-            padding: 2rem 1.5rem;
-            z-index: 1000;
-            transition: all 0.3s ease-in-out;
-            overflow-y: auto; /* Ensure the logout button is visible */
-        }
+/* Sidebar Styles */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 250px;
+    background: var(--light);
+    box-shadow: var(--shadow-md);
+    padding: 2rem 1.5rem;
+    z-index: 1000;
+    transition: all 0.3s ease;
+    overflow-y: auto; /* Ensure the logout button is visible */
 
-        /* Sidebar visible when 'show' class is added */
-        .sidebar.show {
-            left: 0; /* Slide in from the left */
-        }
+}
 
-        .sidebar-logo {
-            color: var(--primary);
-            font-size: 1.75rem;
-            font-weight: 700;
-            margin-bottom: 2.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            text-decoration: none;
-        }
+.sidebar-logo {
+    color: var(--primary);
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+}
 
-        .nav-link {
-            color: var(--dark);
-            padding: 1rem 1.25rem;
-            border-radius: 12px;
-            margin-bottom: 0.75rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            font-size: 1.1rem;
-        }
+.nav-link {
+    color: var(--dark);
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    margin-bottom: 0.75rem;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 1.1rem;
+}
 
-        .nav-link:hover,
-        .nav-link.active {
-            background: var(--gradient);
-            color: var(--light);
-        }
+.nav-link:hover,
+.nav-link.active {
+    background: var(--gradient);
+    color: var(--light);
+    transform: translateX(5px);
+}
 
-        /* Main Content */
-        .main-content {
-            margin-left: 250px;
-            padding: 2rem;
-            min-height: calc(100vh - 80px);
-            transition: margin-left 0.3s ease-in-out;
-        }
+/* Main Content */
+.main-content {
+    margin-left: 250px;
+    padding: 2rem;
+    min-height: calc(100vh - 80px);
+}
 
         /* Adjust main content when sidebar is hidden */
-        .sidebar:not(.show) ~ .main-content {
+        .sidebar:not(.show){
             margin-left: 0;
         }
 
