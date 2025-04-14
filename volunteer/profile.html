@@ -292,6 +292,48 @@
                 badgesContainer.appendChild(badgeElement);
             });
         }
+        document.addEventListener('DOMContentLoaded', function() {
+    // Sidebar functionality
+    const sidebar = document.querySelector('.sidebar');
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const mainContent = document.querySelector('.main-content');
+    
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'sidebar-overlay';
+    document.body.appendChild(overlay);
+
+    // Toggle sidebar
+    mobileMenuToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        sidebar.classList.toggle('show');
+        overlay.classList.toggle('show');
+        document.body.style.overflow = sidebar.classList.contains('show') ? 'hidden' : '';
+    });
+
+    // Close sidebar when clicking overlay
+    overlay.addEventListener('click', () => {
+        sidebar.classList.remove('show');
+        overlay.classList.remove('show');
+        document.body.style.overflow = '';
+    });
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            sidebar.classList.remove('show');
+            overlay.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+    });
+
+    // Add animation to cards
+    document.querySelectorAll('.card').forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+        card.classList.add('animate-in');
+    });
+});
+
 
         // Handle profile form submission
         document.getElementById('profileForm').addEventListener('submit', async (e) => {
@@ -458,41 +500,7 @@
             }
         });
 
-        // Mobile menu toggle
-        document.addEventListener('DOMContentLoaded', () => {
-            const sidebar = document.querySelector('.sidebar');
-            const toggleBtn = document.createElement('button');
-            toggleBtn.className = 'btn btn-primary d-md-none position-fixed';
-            toggleBtn.style.cssText = 'top: 1rem; right: 1rem; z-index: 1001;';
-            toggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
-            document.body.appendChild(toggleBtn);
-
-            toggleBtn.addEventListener('click', () => {
-                sidebar.classList.toggle('show');
-            });
-        });
-
-        // Toggle sidebar visibility on mobile menu button click
-        document.getElementById('mobileMenuToggle').addEventListener('click', () => {
-            document.querySelector('.sidebar').classList.toggle('show');
-        });
-
-        // Close sidebar when clicking outside of it
-        document.addEventListener('click', (e) => {
-            const sidebar = document.querySelector('.sidebar');
-            const toggle = document.getElementById('mobileMenuToggle');
-
-            if (!sidebar.contains(e.target) && e.target !== toggle) {
-                sidebar.classList.remove('show');
-            }
-        });
-
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 768) {
-                document.querySelector('.sidebar').classList.remove('show');
-            }
-        });
+      
     </script>
 </body>
 </html>
