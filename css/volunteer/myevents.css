@@ -1,5 +1,4 @@
-
-        :root {
+:root {
             --primary: #FF6B6B;
             --secondary: #4ECDC4;
             --dark: #2C3E50;
@@ -20,7 +19,7 @@
         /* Sidebar Styles */
         .sidebar {
             position: fixed;
-            left: 0;
+            left: -250px; /* Hidden by default */
             top: 0;
             bottom: 0;
             width: 250px;
@@ -28,6 +27,13 @@
             box-shadow: var(--shadow-md);
             padding: 2rem 1.5rem;
             z-index: 1000;
+            transition: all 0.3s ease-in-out;
+            overflow-y: auto; /* Ensure the logout button is visible */
+        }
+
+        /* Sidebar visible when 'show' class is added */
+        .sidebar.show {
+            left: 0; /* Slide in from the left */
         }
 
         .sidebar-logo {
@@ -63,6 +69,13 @@
         .main-content {
             margin-left: 250px;
             padding: 2rem;
+            min-height: calc(100vh - 80px);
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        /* Adjust main content when sidebar is hidden */
+        .sidebar:not(.show) ~ .main-content {
+            margin-left: 0;
         }
 
         /* Page Header */
@@ -112,90 +125,117 @@
         /* Responsive Design */
         @media (max-width: 768px) {
             .sidebar {
-                transform: translateX(-100%);
+                left: -100%; /* Fully hidden on mobile */
             }
 
             .sidebar.show {
-                transform: translateX(0);
+                left: 0; /* Slide in on mobile */
             }
 
             .main-content {
-                margin-left: 0;
+                margin-left: 0; /* No margin on mobile */
+            }
+
+            #mobileMenuToggle {
+                display: block;
             }
         }
+
+        /* Mobile Menu Toggle Button */
+        #mobileMenuToggle {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            background-color: #ffffff; /* Light background */
+            border: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            transition: background-color 0.3s ease;
+        }
+
+        #mobileMenuToggle:hover {
+            background-color: #f8f9fa; /* Slightly darker on hover */
+        }
+
+        #mobileMenuToggle i {
+            color: #333; /* Icon color */
+        }
+
         /* Add to your existing styles */
-.filters-section .card {
-    border: none;
-    box-shadow: var(--shadow-md);
-}
+        .filters-section .card {
+            border: none;
+            box-shadow: var(--shadow-md);
+        }
 
-.stats-card {
-    border-radius: 15px;
-    padding: 1.5rem;
-    box-shadow: var(--shadow-md);
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
+        .stats-card {
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
 
-.stats-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-}
+        .stats-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
 
-.stats-info h3 {
-    margin: 0;
-    font-size: 1.5rem;
-    font-weight: 600;
-}
+        .stats-info h3 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
 
-.stats-info p {
-    margin: 0;
-    font-size: 0.9rem;
-    opacity: 0.9;
-}
+        .stats-info p {
+            margin: 0;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
 
-.application-card {
-    position: relative;
-}
+        .application-card {
+            position: relative;
+        }
 
-.action-buttons {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 1rem;
-}
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
 
-.timeline {
-    position: relative;
-    padding-left: 2rem;
-    margin-top: 1rem;
-    border-left: 2px solid var(--gray-300);
-}
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+            margin-top: 1rem;
+            border-left: 2px solid var(--gray-300);
+        }
 
-.timeline-item {
-    position: relative;
-    padding-bottom: 1rem;
-}
+        .timeline-item {
+            position: relative;
+            padding-bottom: 1rem;
+        }
 
-.timeline-item::before {
-    content: '';
-    position: absolute;
-    left: -2.4rem;
-    top: 0;
-    width: 1rem;
-    height: 1rem;
-    border-radius: 50%;
-    background: var(--primary);
-    border: 2px solid white;
-}
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2.4rem;
+            top: 0;
+            width: 1rem;
+            height: 1rem;
+            border-radius: 50%;
+            background: var(--primary);
+            border: 2px solid white;
+        }
 
-.timeline-date {
-    font-size: 0.8rem;
-    color: #666;
-}
+        .timeline-date {
+            font-size: 0.8rem;
+            color: #666;
+        }

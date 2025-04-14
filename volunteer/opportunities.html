@@ -13,6 +13,12 @@
 </head>
 
 <body>
+    <!-- Mobile Menu Toggle Button -->
+    <button id="mobileMenuToggle" class="btn btn-light d-md-none position-fixed p-2 rounded-circle shadow-sm" style="top: 1rem; right: 1rem; z-index: 1001;">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
     <nav class="sidebar">
         <a href="dashboard.html" class="sidebar-logo">
             <i class="fas fa-hands-helping"></i>
@@ -39,10 +45,12 @@
             </a>
         </div>
     </nav>
+
+    <!-- Main Content -->
     <div class="main-content">
         <div class="container-fluid">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
+                <div></div>
                     <h2>Find Opportunities</h2>
                     <p class="text-muted">Discover volunteer opportunities near you</p>
                 </div>
@@ -400,6 +408,31 @@
 
         // Attach to the global scope
         window.showEventDetails = showEventDetails;
+    </script>
+
+    <!-- JavaScript for Sidebar Toggle -->
+    <script>
+        // Toggle sidebar visibility on mobile menu button click
+        document.getElementById('mobileMenuToggle').addEventListener('click', () => {
+            document.querySelector('.sidebar').classList.toggle('show');
+        });
+
+        // Close sidebar when clicking outside of it
+        document.addEventListener('click', (e) => {
+            const sidebar = document.querySelector('.sidebar');
+            const toggle = document.getElementById('mobileMenuToggle');
+
+            if (!sidebar.contains(e.target) && e.target !== toggle) {
+                sidebar.classList.remove('show');
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                document.querySelector('.sidebar').classList.remove('show');
+            }
+        });
     </script>
 </body>
 </html>
