@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" >
     <title>Organizer Dashboard - V-Connect</title>
     <link rel="icon" href="../assets/v1.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -360,11 +360,29 @@
                 });
             }
         });
+        document.getElementById('mobileMenuToggle').addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.querySelector('.sidebar').classList.toggle('show');
+});
 
-        document.getElementById('mobileMenuToggle').addEventListener('click', () => {
-            document.querySelector('.sidebar').classList.toggle('show');
-        });
+// Close sidebar when clicking outside on mobile
+document.addEventListener('click', (e) => {
+    const sidebar = document.querySelector('.sidebar');
+    const toggle = document.getElementById('mobileMenuToggle');
+    
+    if (!sidebar.contains(e.target) && e.target !== toggle && window.innerWidth <= 768) {
+        sidebar.classList.remove('show');
+    }
+});
 
+// Handle window resize
+window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) {
+        document.querySelector('.sidebar').classList.remove('show');
+    }
+});
+
+      
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 try {

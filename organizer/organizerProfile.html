@@ -14,42 +14,44 @@
 </head>
 
 <body>
-    <button id="mobileMenuToggle" class="btn btn-primary d-md-none position-fixed"
-        style="top: 1rem; right: 1rem; z-index: 1001;">
-        <i class="fas fa-bars"></i>
-    </button>
-    <nav class="sidebar">
-        <a href="organizerDashboard.html" class="sidebar-logo">
-            <i class="fas fa-hands-helping"></i>
-            <span>V-Connect</span>
+    <!-- Mobile Menu Toggle Button -->
+   <!-- Mobile Menu Toggle Button -->
+   <button id="mobileMenuToggle" class="btn btn-primary d-md-none position-fixed" style="top: 1rem; right: 1rem; z-index: 1001;">
+    <i class="fas fa-bars"></i>
+</button>
+
+<!-- Sidebar -->
+<nav class="sidebar">
+    <a href="organizerDashboard.html" class="sidebar-logo">
+        <i class="fas fa-hands-helping"></i>
+        <span>V-Connect</span>
+    </a>
+    <div class="nav flex-column">
+        <a href="organizerDashboard.html" class="nav-link">
+            <i class="fas fa-home"></i> Dashboard
         </a>
-        <div class="nav flex-column">
-            <a href="organizerDashboard.html" class="nav-link ">
-                <i class="fas fa-home"></i> Dashboard
-            </a>
-            <a href="organizerProfile.html" class="nav-link active">
-                <i class="fas fa-user"></i> Profile
-            </a>
-            <a href="createEvent.html" class="nav-link">
-                <i class="fas fa-calendar-plus"></i> Create Event
-            </a>
-            <a href="manageEvents.html" class="nav-link">
-                <i class="fas fa-tasks"></i> Manage Events
-            </a>
-            <a href="manageVolunteers.html" class="nav-link">
-                <i class="fas fa-users"></i> Manage Volunteers
-            </a>
-            <a href="eventCompletion.html" class="nav-link">
-                <i class="fas fa-check-circle"></i> Event Completion
-            </a>
-            <a href="../home/writeblogs.html" class="nav-link">
-                <i class="fas fa-blog"></i> Blogs
-            </a>
-            <a href="#" class="nav-link" id="logoutBtn">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </a>
-        </div>
-    </nav>
+        <a href="organizerProfile.html" class="nav-link">
+            <i class="fas fa-user"></i> Profile
+        </a>
+        <a href="createEvent.html" class="nav-link active">
+            <i class="fas fa-calendar-plus"></i> Create Event
+        </a>
+        <a href="manageEvents.html" class="nav-link">
+            <i class="fas fa-tasks"></i> Manage Events
+        </a>
+        <a href="manageVolunteers.html" class="nav-link">
+            <i class="fas fa-users"></i> Manage Volunteers
+        </a>
+        <a href="eventCompletion.html" class="nav-link">
+            <i class="fas fa-check-circle"></i> Event Completion
+        </a>
+        <a href="#" class="nav-link" id="logoutBtn">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
+</nav>
+
+    <!-- Main Content -->
     <div class="main-content">
         <div class="container">
             <div class="profile-header">
@@ -477,5 +479,29 @@
         init();
         
     </script>
-    </body>
+    <!-- JavaScript for Sidebar Toggle -->
+    <script>
+        // Toggle sidebar visibility on mobile menu button click
+        document.getElementById('mobileMenuToggle').addEventListener('click', () => {
+            document.querySelector('.sidebar').classList.toggle('show');
+        });
+
+        // Close sidebar when clicking outside of it
+        document.addEventListener('click', (e) => {
+            const sidebar = document.querySelector('.sidebar');
+            const toggle = document.getElementById('mobileMenuToggle');
+
+            if (!sidebar.contains(e.target) && e.target !== toggle) {
+                sidebar.classList.remove('show');
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                document.querySelector('.sidebar').classList.remove('show');
+            }
+        });
+    </script>
+</body>
 </html>

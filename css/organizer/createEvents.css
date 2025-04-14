@@ -1,5 +1,4 @@
-
-        :root {
+:root {
             --primary: #FF6B6B;
             --secondary: #4ECDC4;
             --dark: #2C3E50;
@@ -23,7 +22,7 @@
         /* Sidebar Styles */
         .sidebar {
             position: fixed;
-            left: 0;
+            left: -250px; /* Hidden by default */
             top: 0;
             bottom: 0;
             width: 250px;
@@ -31,7 +30,14 @@
             box-shadow: var(--shadow-md);
             padding: 2rem 1.5rem;
             z-index: 1000;
-            transition: all 0.3s ease;
+            transition: all 0.3s ease-in-out;
+            overflow-y: auto; /* Ensure the logout button is visible */
+
+        }
+
+        /* Sidebar visible when 'show' class is added */
+        .sidebar.show {
+            left: 0; /* Slide in from the left */
         }
 
         .sidebar-logo {
@@ -82,15 +88,15 @@
         /* Responsive Styles */
         @media (max-width: 768px) {
             .sidebar {
-                transform: translateX(-100%);
+                left: -100%; /* Fully hidden on mobile */
             }
 
             .sidebar.show {
-                transform: translateX(0);
+                left: 0; /* Slide in on mobile */
             }
 
             .main-content {
-                margin-left: 0;
+                margin-left: 0; /* No margin on mobile */
             }
 
             #mobileMenuToggle {
@@ -103,9 +109,13 @@
             margin-left: 250px;
             padding: 2rem;
             min-height: calc(100vh - 80px);
-            /* Account for footer */
+            transition: margin-left 0.3s ease-in-out;
         }
 
+        /* Adjust main content when sidebar is hidden */
+        .sidebar:not(.show) ~ .main-content {
+            margin-left: 0;
+        }
 
         .main-container {
             margin-left: 250px;
@@ -186,7 +196,7 @@
             top: -10px;
             right: -10px;
             background: var(--primary);
-            color: var(--light);
+            color: var (--light);
             border: none;
             width: 25px;
             height: 25px;
@@ -276,4 +286,3 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-    

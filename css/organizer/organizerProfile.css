@@ -1,5 +1,4 @@
- 
-        :root {
+:root {
             --primary: #FF6B6B;
             --secondary: #4ECDC4;
             --dark: #2C3E50;
@@ -23,7 +22,7 @@
         /* Sidebar Styles */
         .sidebar {
             position: fixed;
-            left: 0;
+            left: -250px; /* Hidden by default */
             top: 0;
             bottom: 0;
             width: 250px;
@@ -31,14 +30,91 @@
             box-shadow: var(--shadow-md);
             padding: 2rem 1.5rem;
             z-index: 1000;
-            transition: all 0.3s ease;
+            transition: all 0.3s ease-in-out;
+            overflow-y: auto; /* Ensure the logout button is visible */
         }
 
+        /* Sidebar visible when 'show' class is added */
+        .sidebar.show {
+            left: 0; /* Slide in from the left */
+        }
+
+        .sidebar-logo {
+            color: var(--primary);
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+
+        .sidebar-logo:hover {
+            color: var(--primary);
+        }
+        .nav-link {
+            color: var(--text-dark);
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: var(--gradient);
+            color: var(--light);
+            transform: translateX(5px);
+        }
+
+        /* Mobile Menu Toggle */
+        #mobileMenuToggle {
+            display: none;
+            background: var(--primary);
+            border: none;
+            padding: 0.5rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow-md);
+        } /* Responsive Styles */
+        @media (max-width: 768px) {
+            .sidebar {
+                left: -100%; /* Fully hidden on mobile */
+            }
+
+            .sidebar.show {
+                left: 0; /* Slide in on mobile */
+            }
+
+            .main-content {
+                margin-left: 0; /* No margin on mobile */
+            }
+
+            #mobileMenuToggle {
+                display: block;
+            }
+        }
         .main-content {
             margin-left: 250px;
             padding: 2rem;
-            min-height: 100vh;
-            background: var(--gray-100);
+            min-height: calc(100vh - 80px);
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        /* Adjust main content when sidebar is hidden */
+        .sidebar:not(.show) ~ .main-content {
+            margin-left: 0;
+        }
+
+        .main-container {
+            margin-left: 250px;
+            padding: 2rem;
+            transition: margin .3s ease;
         }
 
         /* Profile Header Styles */
@@ -236,7 +312,7 @@
         /* Sidebar Styles */
         .sidebar {
             position: fixed;
-            left: 0;
+            left: -250px; /* Hidden by default */
             top: 0;
             bottom: 0;
             width: 250px;
@@ -244,7 +320,13 @@
             box-shadow: var(--shadow-md);
             padding: 2rem 1.5rem;
             z-index: 1000;
-            transition: all 0.3s ease;
+            transition: all 0.3s ease-in-out;
+            overflow-y: auto; /* Ensure the logout button is visible */
+        }
+
+        /* Sidebar visible when 'show' class is added */
+        .sidebar.show {
+            left: 0; /* Slide in from the left */
         }
 
         .sidebar-logo {
@@ -277,6 +359,39 @@
             color: var(--light);
             transform: translateX(5px);
         }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+            min-height: calc(100vh - 80px);
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        /* Adjust main content when sidebar is hidden */
+        .sidebar:not(.show) ~ .main-content {
+            margin-left: 0;
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .sidebar {
+                left: -100%; /* Fully hidden on mobile */
+            }
+
+            .sidebar.show {
+                left: 0; /* Slide in on mobile */
+            }
+
+            .main-content {
+                margin-left: 0; /* No margin on mobile */
+            }
+
+            #mobileMenuToggle {
+                display: block;
+            }
+        }
+
 .notification-badge {
     position: absolute;
     top: 10px;
