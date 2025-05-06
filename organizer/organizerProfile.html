@@ -50,6 +50,24 @@
         </a>
     </div>
 </nav>
+<!-- Add this in the profile-header div -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 id="organizerName" class="mb-1">Loading...</h2>
+    <div class="d-flex align-items-center gap-3">
+        <div class="notification-dropdown">
+            <button class="btn btn-light position-relative" id="notificationBtn">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge" id="notificationBadge">0</span>
+            </button>
+            <div class="notification-menu" id="notificationMenu">
+                <!-- Notifications will be loaded here -->
+            </div>
+        </div>
+        <button class="btn btn-primary" id="editProfileBtn">
+            <i class="fas fa-edit me-2"></i>Edit Profile
+        </button>
+    </div>
+</div>
 
     <!-- Main Content -->
     <div class="main-content">
@@ -210,47 +228,137 @@
         };
         
         // Notification System
-        const notifications = {
-            async send(userId, title, message, type) {
-                try {
-                    await addDoc(collection(db, "notifications"), {
-                        userId,
-                        title,
-                        message,
-                        type,
-                        read: false,
-                        createdAt: new Date().toISOString()
-                    });
-                    await this.checkUnread(userId);
-                } catch (error) {
-                    console.error("Error sending notification:", error);
-                }
-            },
+     // Add these functions to your existing script
+const profileManager = {
+    isEditMode: false,
+
+    toggleEditMode() {
+        this.isEditMode = !this.isEditMode;
+        const form = elements.profileForm;
+        const inputs = form.querySelectorAll('input, textarea');
+        const editBtn = document.getElementById('editProfileBtn');
         
-            async sendProfileUpdate(userId, updateType) {
-                const messages = {
-                    photo: 'Your profile photo has been updated successfully.',
-                    info: 'Your profile information has been updated successfully.'
-                };
-                await this.send(userId, 'Profile Updated', messages[updateType], 'profile_update');
-            },
+        inputs.forEach(input => {
+            input.readOnly = !this.isEditMode;
+        });
+
+        form.classList.toggle('edit-mode');
         
-            async checkUnread(userId) {
-                try {
-                    const snapshot = await getDocs(query(
-                        collection(db, "notifications"),
-                        where("userId", "==", userId),
-                        where("read", "==", false)
-                    ));
-                    
-                    elements.notificationBadge.textContent = snapshot.size;
-                    elements.notificationBadge.style.display = snapshot.size > 0 ? 'flex' : 'none';
-                } catch (error) {
-                    console.error("Error checking notifications:", error);
-                }
-            }
-        };
-        
+        if (this.isEditMode) {
+            editBtn.innerHTML = '<i class="fas fa-times me-2"></i>Cancel';
+            editBtn.classList.replace('btn-primary', 'btn-danger');
+        } else {
+            editBtn.innerHTML = '<i class="fas fa-edit me-2"></i>Edit Profile';
+            editBtn.classList.replace('btn-danger', 'btn-primary');
+            profile.load(); // Reset form to original values
+        }
+    },
+
+    async saveChanges() {
+        try {
+            const user = auth.currentUser;
+            if (!user) throw new Error('Please sign in');
+
+            const formData = {
+                name: elements.fullName.value,
+                organizationName: elements.organizationName.value,
+                phone: elements.phone.value,
+                website: elements.website.value,
+                about: elements.about.value,
+                address: elements.address.value,
+                city: elements.city.value,
+                social: {
+                    facebook: elements.facebook.value,
+                    twitter: elements.twitter.value,
+                    linkedin: elements.linkedin.value,
+                    instagram: elements.instagram.value
+                },
+                updatedAt: new Date().toISOString()
+            };
+
+            await updateDoc(doc(db, "users", user.uid), formData);
+            await notifications.sendProfileUpdate(user.uid, 'info');
+
+            this.toggleEditMode();
+            
+            Swal.fire({
+                icon: 'success',
+                title: 'Profile Updated',
+                text: 'Your profile has been updated successfully!',
+                showConfirmButton: false,
+                timer: 1500
+            });
+
+        } catch (error) {
+            profile.handleError(error);
+        }
+    }
+};
+
+// Update notification system
+const notifications = {
+    async load(userId) {
+        try {
+            const snapshot = await getDocs(query(
+                collection(db, "notifications"),
+                where("userId", "==", userId),
+                orderBy("createdAt", "desc"),
+                limit(10)
+            ));
+
+            const notificationMenu = document.getElementById('notificationMenu');
+            notificationMenu.innerHTML = snapshot.docs.length ? '' : 
+                '<div class="p-3 text-center text-muted">No notifications</div>';
+
+            snapshot.docs.forEach(doc => {
+                const notification = doc.data();
+                notificationMenu.innerHTML += `
+                    <div class="notification-item ${!notification.read ? 'unread' : ''}"
+                         onclick="notifications.markAsRead('${doc.id}')">
+                        <div class="d-flex justify-content-between">
+                            <strong>${notification.title}</strong>
+                            <small>${new Date(notification.createdAt).toLocaleDateString()}</small>
+                        </div>
+                        <p class="mb-0">${notification.message}</p>
+                    </div>
+                `;
+            });
+
+            this.updateBadge(userId);
+        } catch (error) {
+            console.error("Error loading notifications:", error);
+        }
+    },
+
+    async markAsRead(notificationId) {
+        try {
+            await updateDoc(doc(db, "notifications", notificationId), {
+                read: true
+            });
+            this.load(auth.currentUser.uid);
+        } catch (error) {
+            console.error("Error marking notification as read:", error);
+        }
+    }
+};
+
+// Add event listeners
+document.getElementById('editProfileBtn').addEventListener('click', () => {
+    profileManager.toggleEditMode();
+});
+
+document.getElementById('notificationBtn').addEventListener('click', () => {
+    const menu = document.getElementById('notificationMenu');
+    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+});
+
+// Close notification menu when clicking outside
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.notification-dropdown')) {
+        document.getElementById('notificationMenu').style.display = 'none';
+    }
+});
+
         // Profile Management
         const profile = {
             async load() {
@@ -475,33 +583,14 @@
         });
 
         
-        // Start the application
-        init();
-        
+        function init() {
+    // Make form fields readonly by default
+    const inputs = elements.profileForm.querySelectorAll('input, textarea');
+    inputs.forEach(input => {
+        input.readOnly = true;
+    });
+}
     </script>
-    <!-- JavaScript for Sidebar Toggle -->
-    <script>
-        // Toggle sidebar visibility on mobile menu button click
-        document.getElementById('mobileMenuToggle').addEventListener('click', () => {
-            document.querySelector('.sidebar').classList.toggle('show');
-        });
-
-        // Close sidebar when clicking outside of it
-        document.addEventListener('click', (e) => {
-            const sidebar = document.querySelector('.sidebar');
-            const toggle = document.getElementById('mobileMenuToggle');
-
-            if (!sidebar.contains(e.target) && e.target !== toggle) {
-                sidebar.classList.remove('show');
-            }
-        });
-
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 768) {
-                document.querySelector('.sidebar').classList.remove('show');
-            }
-        });
-    </script>
+ 
 </body>
 </html>

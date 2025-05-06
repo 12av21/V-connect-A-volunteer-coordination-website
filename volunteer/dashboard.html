@@ -12,24 +12,31 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/volunteer/dashboard.css">
-
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
 </head>
 
 <body>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
     <!-- Mobile Menu Toggle Button -->
-    <button id="mobileMenuToggle" class="btn btn-light d-md-none position-fixed p-2 rounded-circle shadow-sm" style="top: 1rem; right: 1rem; z-index: 1001;">
+    <button id="mobileMenuToggle" class="btn btn-light d-md-none position-fixed p-2 rounded-circle shadow-sm">
         <i class="fas fa-bars"></i>
     </button>
 
     <!-- Sidebar -->
     <nav class="sidebar">
-        <a href="dashboard.html" class="sidebar-logo">
-            <i class="fas fa-hands-helping"></i>
-            <span>V-Connect</span>
-        </a>
+        <div class="sidebar-header">
+            <a href="dashboard.html" class="sidebar-logo">
+                <i class="fas fa-hands-helping"></i>
+                <span>V-Connect</span>
+            </a>
+            <button class="btn-close d-md-none" id="closeSidebar"></button>
+        </div>
         <div class="nav flex-column">
             <a href="dashboard.html" class="nav-link active">
                 <i class="fas fa-home"></i> Dashboard
@@ -56,390 +63,426 @@
     </nav>
 
     <!-- Main Content -->
-    <div class="main-content">
-        <div class="container-fluid">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h2 id="welcomeMessage">Welcome back, <span id="volunteerName">Volunteer</span>!</h2>
-                    <p class="text-muted">Here's your volunteering overview</p>
-                </div>
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <div class="welcome-section">
+                <h2 id="welcomeMessage">Welcome back, <span id="volunteerName">Volunteer</span>!</h2>
+                <p class="text-muted">Here's your volunteering overview</p>
+            </div>
+            <div class="actions">
                 <button class="btn btn-primary" id="refreshBtn">
                     <i class="fas fa-sync-alt me-2"></i>Refresh
                 </button>
             </div>
+        </div>
 
-            <!-- Stats Section -->
-            <div class="row g-4">
-                <div class="col-md-3">
-                    <div class="stats-card text-center">
-                        <div class="stats-icon bg-primary bg-opacity-10 text-primary">
-                            <i class="fas fa-calendar-check"></i>
-                        </div>
-                        <div class="stats-value" id="eventsAttended">0</div>
-                        <div class="stats-label">Events Attended</div>
+        <!-- Stats Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-3 col-sm-6">
+                <div class="stats-card">
+                    <div class="stats-icon bg-primary bg-opacity-10">
+                        <i class="fas fa-calendar-check text-primary"></i>
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stats-card text-center">
-                        <div class="stats-icon bg-success bg-opacity-10 text-success">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <div class="stats-value" id="completedEvents">0</div>
-                        <div class="stats-label">Completed Events</div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stats-card text-center">
-                        <div class="stats-icon bg-warning bg-opacity-10 text-warning">
-                            <i class="fas fa-star"></i>
-                        </div>
-                        <div class="stats-value" id="totalPoints">0</div>
-                        <div class="stats-label">Total Points</div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stats-card text-center">
-                        <div class="stats-icon bg-info bg-opacity-10 text-info">
-                            <i class="fas fa-medal"></i>
-                        </div>
-                        <div class="stats-value" id="badgesEarned">0</div>
-                        <div class="stats-label">Badges Earned</div>
+                    <div class="stats-info">
+                        <h3 id="eventsAttended">0</h3>
+                        <p>Events Attended</p>
                     </div>
                 </div>
             </div>
-
-            <!-- Badges Section -->
-            <div class="card mt-4">
-                <div class="card-body">
-                    <h4 class="card-title mb-4">
-                        <i class="fas fa-award me-2"></i>
-                        Your Badges
-                        <small class="text-muted ms-2">
-                            (<span id="badgesEarned">0</span> earned)
-                        </small>
-                    </h4>
-                    <div class="badges-container" id="badgesContainer">
-                        <!-- Badges will be inserted here -->
+            <div class="col-md-3 col-sm-6">
+                <div class="stats-card">
+                    <div class="stats-icon bg-success bg-opacity-10">
+                        <i class="fas fa-check-circle text-success"></i>
+                    </div>
+                    <div class="stats-info">
+                        <h3 id="completedEvents">0</h3>
+                        <p>Completed Events</p>
                     </div>
                 </div>
             </div>
-
-            <!-- Charts Section -->
-            <div class="row mt-4">
-                <div class="col-md-6">
-                    <div class="chart-card">
-                        <h4>Events Overview</h4>
-                        <canvas id="eventsChart"></canvas>
+            <div class="col-md-3 col-sm-6">
+                <div class="stats-card">
+                    <div class="stats-icon bg-warning bg-opacity-10">
+                        <i class="fas fa-star text-warning"></i>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="chart-card">
-                        <h4>Impact Overview</h4>
-                        <canvas id="impactChart"></canvas>
+                    <div class="stats-info">
+                        <h3 id="totalPoints">0</h3>
+                        <p>Total Points</p>
                     </div>
                 </div>
             </div>
-
-            <!-- Quick Actions -->
-            <div class="quick-actions mt-4">
-                <div class="action-card" onclick="window.location.href='opportunities.html'">
-                    <i class="fas fa-search fa-2x mb-3"></i>
-                    <h5>Find Events</h5>
-                </div>
-                <div class="action-card" onclick="window.location.href='myevents.html'">
-                    <i class="fas fa-calendar fa-2x mb-3"></i>
-                    <h5>My Events</h5>
-                </div>
-                <div class="action-card" onclick="window.location.href='certificates.html'">
-                    <i class="fas fa-certificate fa-2x mb-3"></i>
-                    <h5>Certificates</h5>
-                </div>
-            </div>
-
-            <!-- Upcoming Events -->
-            <div class="card mt-4">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h4 class="card-title mb-0">Upcoming Events</h4>
-                        <a href="opportunities.html" class="btn btn-outline-primary btn-sm">
-                            View All
-                        </a>
+            <div class="col-md-3 col-sm-6">
+                <div class="stats-card">
+                    <div class="stats-icon bg-info bg-opacity-10">
+                        <i class="fas fa-medal text-info"></i>
                     </div>
-                    <div id="latestEvents">
-                        <!-- Upcoming events will be inserted here -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Leaderboard Section -->
-            <div class="leaderboard-section mt-4">
-                <div class="card">
-                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                        <h4 class="mb-0"><i class="fas fa-trophy"></i> Top Volunteers</h4>
-                        <button class="btn btn-light btn-sm" id="refreshLeaderboard">
-                            <i class="fas fa-sync-alt"></i> Refresh
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <div class="top-volunteers mb-4">
-                            <div class="row g-3" id="topThree">
-                                <!-- Top 3 volunteers will be inserted here -->
-                            </div>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Rank</th>
-                                        <th>Volunteer</th>
-                                        <th>Hours</th>
-                                        <th>Events</th>
-                                        <th>Points</th>
-                                        <th>Achievements</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="leaderboardTable">
-                                    <!-- Leaderboard data will be inserted here -->
-                                </tbody>
-                            </table>
-                        </div>
+                    <div class="stats-info">
+                        <h3 id="badgesEarned">0</h3>
+                        <p>Badges Earned</p>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Charts Section -->
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h5>Events Overview</h5>
+                        <select class="form-select form-select-sm" id="eventChartPeriod">
+                            <option value="6">Last 6 months</option>
+                            <option value="12">Last 12 months</option>
+                        </select>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="eventsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h5>Impact Overview</h5>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="impactChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Recent Activity</h5>
+            </div>
+            <div class="card-body">
+                <div id="recentActivity" class="activity-feed">
+                    <!-- Activities will be inserted here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Events -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Upcoming Events</h5>
+                <a href="opportunities.html" class="btn btn-sm btn-primary">View All</a>
+            </div>
+            <div class="card-body">
+                <div id="upcomingEvents" class="row g-3">
+                    <!-- Events will be inserted here -->
+                </div>
+            </div>
+        </div>
     </div>
+</main>
 
     <!-- Scripts -->
     <script src="../config/firebaseConfig.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
     <script type="module">
+        // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut
+        import { 
+            getAuth, 
+            onAuthStateChanged, 
+            signOut 
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import {getFirestore, collection, query, where, getDocs
+        import { 
+            getFirestore, 
+            doc, 
+            getDoc,
+            collection,
+            query,
+            where,
+            getDocs,
+            orderBy,
+            limit 
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-
-        // DOM Elements
-        const volunteerName = document.getElementById("volunteerName");
-        const eventsAttended = document.getElementById("eventsAttended");
-        const completedEvents = document.getElementById("completedEvents");
-        const totalPoints = document.getElementById("totalPoints");
-        const badgesEarned = document.getElementById("badgesEarned");
-        const badgesContainer = document.getElementById("badgesContainer");
-        const latestEvents = document.getElementById("latestEvents");
-        const topThree = document.getElementById("topThree");
-        const leaderboardTable = document.getElementById("leaderboardTable");
-
-        // Charts
-        let eventsChart, impactChart;
-
-        // Show loading spinner
-        function showLoading() {
-            Swal.fire({
-                title: "Loading...",
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
+    
+        // Global chart variables
+        let eventsChart = null;
+        let impactChart = null;
+    
+        // Loading overlay functions
+        const showLoading = () => document.getElementById('loadingOverlay').style.display = 'flex';
+        const hideLoading = () => document.getElementById('loadingOverlay').style.display = 'none';
+    
+        // Format date helper function
+        function formatDate(timestamp) {
+            if (!timestamp) return '';
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            return date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+        }
+    
+        // Get activity icon helper function
+        function getActivityIcon(type) {
+            const icons = {
+                'event_joined': 'fa-calendar-plus',
+                'event_completed': 'fa-check-circle',
+                'badge_earned': 'fa-medal',
+                'points_earned': 'fa-star'
+            };
+            return icons[type] || 'fa-circle';
+        }
+    
+        // Update charts functions
+        function updateEventStatsChart(monthlyData) {
+            const ctx = document.getElementById('eventsChart').getContext('2d');
+            
+            if (eventsChart instanceof Chart) {
+                eventsChart.destroy();
+            }
+    
+            const labels = Object.keys(monthlyData);
+            const data = Object.values(monthlyData);
+    
+            eventsChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Events per Month',
+                        data: data,
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1 }
+                        }
+                    }
                 }
             });
         }
-
-        // Hide loading spinner
-        function hideLoading() {
-            Swal.close();
+    
+        function updateImpactChart(categoryData) {
+            const ctx = document.getElementById('impactChart').getContext('2d');
+            
+            if (impactChart instanceof Chart) {
+                impactChart.destroy();
+            }
+    
+            impactChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(categoryData),
+                    datasets: [{
+                        data: Object.values(categoryData),
+                        backgroundColor: [
+                            '#FF6384',
+                            '#36A2EB',
+                            '#FFCE56',
+                            '#4BC0C0',
+                            '#9966FF'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
         }
-
-        // Load volunteer stats
-        async function loadStats(userId) {
+    
+        // Load dashboard data function
+        async function loadDashboardData() {
             showLoading();
             try {
-                // Fetch stats from Firestore
-                const statsQuery = query(collection(db, "stats"), where("userId", "==", userId));
-                const statsSnapshot = await getDocs(statsQuery);
-
-                if (!statsSnapshot.empty) {
-                    const stats = statsSnapshot.docs[0].data();
-                    eventsAttended.textContent = stats.eventsAttended || 0;
-                    completedEvents.textContent = stats.completedEvents || 0;
-                    totalPoints.textContent = stats.totalPoints || 0;
-                    badgesEarned.textContent = stats.badgesEarned || 0;
-
-                    // Load badges
-                    loadBadges(stats.badges || []);
+                const user = auth.currentUser;
+                if (!user) throw new Error('Please sign in');
+    
+                // Fetch volunteer profile
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    document.getElementById('volunteerName').textContent = 
+                        userData.name || user.displayName || 'Volunteer';
                 }
+    
+                // Initialize data containers
+                let totalEvents = 0;
+                let completedEvents = 0;
+                let totalPoints = 0;
+                let monthlyEventData = {};
+                let categoryData = {};
+    
+                // Fetch event registrations
+                const registrationsQuery = query(
+                    collection(db, "eventRegistrations"),
+                    where("volunteerId", "==", user.uid)
+                );
+                const registrationsSnapshot = await getDocs(registrationsQuery);
+    
+                // Process event data
+                registrationsSnapshot.forEach(doc => {
+                    const registration = doc.data();
+                    totalEvents++;
+                    
+                    if (registration.status === 'completed') {
+                        completedEvents++;
+                        totalPoints += registration.points || 0;
+                    }
+    
+                    if (registration.date) {
+                        const date = registration.date.toDate();
+                        const monthYear = date.toLocaleString('default', { 
+                            month: 'short', 
+                            year: 'numeric' 
+                        });
+                        monthlyEventData[monthYear] = (monthlyEventData[monthYear] || 0) + 1;
+                    }
+    
+                    const category = registration.category || 'Other';
+                    categoryData[category] = (categoryData[category] || 0) + 1;
+                });
+    
+                // Update stats
+                document.getElementById('eventsAttended').textContent = totalEvents;
+                document.getElementById('completedEvents').textContent = completedEvents;
+                document.getElementById('totalPoints').textContent = totalPoints;
+    
+                // Update charts
+                updateEventStatsChart(monthlyEventData);
+                updateImpactChart(categoryData);
+    
+                // Fetch and display recent activities
+                const activitiesQuery = query(
+                    collection(db, "activities"),
+                    where("volunteerId", "==", user.uid),
+                    orderBy("timestamp", "desc"),
+                    limit(5)
+                );
+                const activitiesSnapshot = await getDocs(activitiesQuery);
+                displayActivities(activitiesSnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                })));
+    
             } catch (error) {
-                console.error("Error loading stats:", error);
-                Swal.fire("Error", "Failed to load stats. Please try again later.", "error");
+                console.error("Error loading dashboard:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to load dashboard data'
+                });
             } finally {
                 hideLoading();
             }
         }
-
-        // Load badges
-        function loadBadges(badges) {
-            badgesContainer.innerHTML = "";
-            if (badges.length === 0) {
-                badgesContainer.innerHTML = "<p class='text-muted'>No badges earned yet.</p>";
+    
+        // Display activities function
+        function displayActivities(activities) {
+            const recentActivity = document.getElementById('recentActivity');
+            if (!recentActivity) return;
+    
+            if (activities.length === 0) {
+                recentActivity.innerHTML = `
+                    <div class="text-center py-4">
+                        <i class="fas fa-info-circle fa-2x text-muted mb-3"></i>
+                        <p class="text-muted">No recent activities</p>
+                    </div>
+                `;
                 return;
             }
-
-            badges.forEach((badge) => {
-                const badgeElement = document.createElement("div");
-                badgeElement.className = "badge-item";
-                badgeElement.innerHTML = `
-                    <img src="${badge.image}" alt="${badge.name}" class="badge-image">
-                    <p class="badge-name">${badge.name}</p>
-                `;
-                badgesContainer.appendChild(badgeElement);
-            });
+    
+            recentActivity.innerHTML = activities.map(activity => `
+                <div class="activity-item">
+                    <div class="d-flex align-items-center">
+                        <div class="activity-icon me-3">
+                            <i class="fas ${getActivityIcon(activity.type)} text-primary"></i>
+                        </div>
+                        <div>
+                            <p class="mb-1">${activity.description}</p>
+                            <small class="text-muted">${formatDate(activity.timestamp)}</small>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
         }
-
-        // Load upcoming events
-        async function loadUpcomingEvents(userId) {
+    
+        // Event listeners
+        document.getElementById('refreshBtn')?.addEventListener('click', loadDashboardData);
+        
+        document.getElementById('logoutBtn')?.addEventListener('click', async () => {
             try {
-                const eventsQuery = query(
-                    collection(db, "events"),
-                    where("userId", "==", userId),
-                    where("status", "==", "upcoming")
-                );
-                const eventsSnapshot = await getDocs(eventsQuery);
-
-                latestEvents.innerHTML = "";
-                if (eventsSnapshot.empty) {
-                    latestEvents.innerHTML = "<p class='text-muted'>No upcoming events.</p>";
-                    return;
-                }
-
-                eventsSnapshot.forEach((doc) => {
-                    const event = doc.data();
-                    const eventElement = document.createElement("div");
-                    eventElement.className = "event-item";
-                    eventElement.innerHTML = `
-                        <h5>${event.title}</h5>
-                        <p class="text-muted">${new Date(event.date).toLocaleDateString()}</p>
-                    `;
-                    latestEvents.appendChild(eventElement);
+                const result = await Swal.fire({
+                    title: 'Logout',
+                    text: 'Are you sure you want to logout?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, logout'
                 });
-            } catch (error) {
-                console.error("Error loading upcoming events:", error);
-            }
-        }
-
-        // Load leaderboard
-        async function loadLeaderboard() {
-            try {
-                const leaderboardQuery = query(collection(db, "leaderboard"));
-                const leaderboardSnapshot = await getDocs(leaderboardQuery);
-
-                topThree.innerHTML = "";
-                leaderboardTable.innerHTML = "";
-
-                if (leaderboardSnapshot.empty) {
-                    topThree.innerHTML = "<p class='text-muted'>No leaderboard data available.</p>";
-                    return;
+    
+                if (result.isConfirmed) {
+                    await signOut(auth);
+                    window.location.href = '../home/signup.html';
                 }
-
-                let rank = 1;
-                leaderboardSnapshot.forEach((doc) => {
-                    const volunteer = doc.data();
-
-                    if (rank <= 3) {
-                        const topVolunteer = document.createElement("div");
-                        topVolunteer.className = "col-md-4";
-                        topVolunteer.innerHTML = `
-                            <div class="top-volunteer-card">
-                                <img src="${volunteer.photo}" alt="${volunteer.name}" class="volunteer-avatar">
-                                <h5>${volunteer.name}</h5>
-                                <p class="text-muted">${volunteer.points} points</p>
-                            </div>
-                        `;
-                        topThree.appendChild(topVolunteer);
-                    }
-
-                    const row = document.createElement("tr");
-                    row.innerHTML = `
-                        <td>${rank}</td>
-                        <td>${volunteer.name}</td>
-                        <td>${volunteer.hours}</td>
-                        <td>${volunteer.events}</td>
-                        <td>${volunteer.points}</td>
-                        <td>${volunteer.achievements}</td>
-                    `;
-                    leaderboardTable.appendChild(row);
-
-                    rank++;
-                });
             } catch (error) {
-                console.error("Error loading leaderboard:", error);
-            }
-        }
-
-        // Initialize charts
-        function initializeCharts() {
-            const eventsCtx = document.getElementById("eventsChart").getContext("2d");
-            const impactCtx = document.getElementById("impactChart").getContext("2d");
-
-            if (eventsChart) eventsChart.destroy();
-            if (impactChart) impactChart.destroy();
-
-            eventsChart = new Chart(eventsCtx, {
-                type: "bar",
-                data: {
-                    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-                    datasets: [
-                        {
-                            label: "Events Attended",
-                            data: [5, 10, 8, 6, 12, 9],
-                            backgroundColor: "rgba(54, 162, 235, 0.5)"
-                        }
-                    ]
-                }
-            });
-
-            impactChart = new Chart(impactCtx, {
-                type: "pie",
-                data: {
-                    labels: ["Education", "Environment", "Health"],
-                    datasets: [
-                        {
-                            data: [40, 30, 30],
-                            backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"]
-                        }
-                    ]
-                }
-            });
-        }
-
-        // Logout functionality
-        document.getElementById("logoutBtn").addEventListener("click", async () => {
-            try {
-                await signOut(auth);
-                Swal.fire("Logged Out", "You have been successfully logged out.", "success").then(() => {
-                    window.location.href = "../home/signup.html";
-                });
-            } catch (error) {
-                console.error("Error logging out:", error);
-                Swal.fire("Error", "Failed to log out. Please try again.", "error");
+                console.error("Logout error:", error);
+                Swal.fire('Error', 'Failed to logout', 'error');
             }
         });
-
-        // On auth state change
-        onAuthStateChanged(auth, (user) => {
+    
+        // Initialize dashboard
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
-                volunteerName.textContent = user.displayName || "Volunteer";
-                loadStats(user.uid);
-                loadUpcomingEvents(user.uid);
-                loadLeaderboard();
-                initializeCharts();
+                try {
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        if (userData.userType === 'volunteer') {
+                            await loadDashboardData();
+                        } else {
+                            await Swal.fire({
+                                icon: 'error',
+                                title: 'Access Denied',
+                                text: 'You do not have volunteer privileges.'
+                            });
+                            await signOut(auth);
+                            window.location.href = '../home/signup.html';
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error:", error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to load dashboard'
+                    });
+                }
             } else {
-                window.location.href = "../home/signup.html";
+                window.location.href = '../home/signup.html';
             }
         });
     </script>
-</body>
-
-</html>
+    
+    </body>
+    </html>
+     

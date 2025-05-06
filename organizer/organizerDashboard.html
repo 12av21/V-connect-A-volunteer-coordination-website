@@ -339,7 +339,7 @@
             try {
                 const result = await Swal.fire({
                     title: 'Are you sure?',
-                    text: "You will be logged out of your account",
+                    text: "You will be logged out of your account.",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#FF6B6B',
@@ -348,18 +348,26 @@
                 });
 
                 if (result.isConfirmed) {
-                    await signOut(auth);
-                    window.location.href = '/home/signup.html';
+                    await signOut(auth); // Ensure `auth` is properly initialized
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Logged Out',
+                        text: 'You have been successfully logged out.',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    window.location.href = '../home/signup.html'; // Ensure the correct path to the signup page
                 }
             } catch (error) {
                 console.error("Logout error:", error);
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: error.message
+                    text: 'Failed to log out. Please try again.'
                 });
             }
         });
+
         document.getElementById('mobileMenuToggle').addEventListener('click', (e) => {
     e.stopPropagation();
     document.querySelector('.sidebar').classList.toggle('show');
