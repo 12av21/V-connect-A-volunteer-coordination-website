@@ -14,6 +14,13 @@
 </head>
 
 <body>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
     <nav class="sidebar">
         <a href="dashboard.html" class="sidebar-logo">
             <i class="fas fa-hands-helping"></i>
@@ -107,7 +114,8 @@
         from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import {
             getAuth,
-            onAuthStateChanged
+            onAuthStateChanged,
+            signOut
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import {
             getFirestore,
@@ -131,22 +139,17 @@
 
         async function getUserType(userId) {
             try {
-                const organizerDoc = await getDoc(doc(db, "organizers", userId));
-                if (organizerDoc.exists()) {
-                    return 'organizer';
+                const userDoc = await getDoc(doc(db, "users", userId));
+                if (userDoc.exists()) {
+                    return userDoc.data().userType || 'volunteer';
                 }
-
-                const volunteerDoc = await getDoc(doc(db, "users", userId));
-                if (volunteerDoc.exists()) {
-                    return 'volunteer';
-                }
-
-                return 'user'; 
+                return 'volunteer'; 
             } catch (error) {
                 console.error("Error getting user type:", error);
-                return 'user';
+                return 'volunteer';
             }
         }
+        
         const quill = new Quill('#editor', {
             theme: 'snow',
             modules: {
@@ -181,17 +184,17 @@
                 tagElement.className = 'tag';
                 tagElement.innerHTML = `
                     ${tag}
-                    <button type="button" onclick="removeTag('${tag}')">
+                    <button type="button" class="tag-remove-btn">
                         <i class="fas fa-times"></i>
                     </button>
                 `;
+                tagElement.querySelector('.tag-remove-btn').addEventListener('click', () => {
+                    tags.delete(tag);
+                    renderTags();
+                });
                 tagContainer.appendChild(tagElement);
             });
         }
-        window.removeTag = function (tag) {
-            tags.delete(tag);
-            renderTags();
-        };
 
         document.getElementById('blogImage').addEventListener('change', function (e) {
             const file = e.target.files[0];
@@ -208,10 +211,14 @@
 
         document.getElementById('blogForm').addEventListener('submit', async function (e) {
             e.preventDefault();
+            
+            if (!validateForm()) {
+                return;
+            }
+
+            showLoading();
 
             try {
-                document.getElementById('loadingOverlay').style.display = 'flex';
-
                 const user = auth.currentUser;
                 if (!user) throw new Error('Please sign in to publish a blog');
 
@@ -224,7 +231,8 @@
                     await uploadBytes(storageRef, imageFile);
                     imageUrl = await getDownloadURL(storageRef);
                 }
-                const userDoc = await getDoc(doc(db, userType === 'organizer' ? 'organizers' : 'users', user.uid));
+                
+                const userDoc = await getDoc(doc(db, "users", user.uid));
                 const userData = userDoc.data();
 
                 const blogData = {
@@ -234,7 +242,7 @@
                     content: quill.root.innerHTML,
                     imageUrl,
                     tags: Array.from(tags),
-                    author: userData?.displayName || user.displayName || 'Anonymous',
+                    author: userData?.name || user.displayName || 'Anonymous',
                     authorId: user.uid,
                     authorType: userType, 
                     authorPhoto: userData?.photoURL || user.photoURL,
@@ -244,16 +252,16 @@
                     status: 'published'
                 };
 
-                if (!blogData.title || !blogData.category || !blogData.description || !blogData.content) {
-                    throw new Error('Please fill in all required fields');
-                }
-
                 const docRef = await addDoc(collection(db, "blogs"), blogData);
 
-                await addDoc(collection(db, `${userType}s/${user.uid}/blogs`), {
+                // Add reference to user's blogs collection
+                await addDoc(collection(db, `users/${user.uid}/blogs`), {
                     blogId: docRef.id,
                     createdAt: serverTimestamp()
                 });
+
+                // Clear draft after successful publish
+                localStorage.removeItem('blogDraft_' + user.uid);
 
                 Swal.fire({
                     icon: 'success',
@@ -273,7 +281,7 @@
                     text: error.message || 'Failed to publish blog'
                 });
             } finally {
-                document.getElementById('loadingOverlay').style.display = 'none';
+                hideLoading();
             }
         });
 
@@ -291,7 +299,7 @@
             const description = document.getElementById('blogDescription').value;
             const content = quill.root.innerHTML;
 
-            if (!title || !category || !description || !content) {
+            if (!title || !category || !description || quill.getText().trim().length === 0) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Validation Error',
@@ -301,6 +309,7 @@
             }
             return true;
         }
+        
         let autoSaveTimeout;
         const autoSave = (content) => {
             clearTimeout(autoSaveTimeout);
@@ -323,6 +332,7 @@
                 }
             }, 1000);
         };
+        
         const loadDraft = () => {
             try {
                 const user = auth.currentUser;
@@ -355,21 +365,44 @@
                 console.error("Error loading draft:", error);
             }
         };
+        
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                const result = await Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You will be logged out",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, logout'
+                });
+
+                if (result.isConfirmed) {
+                    await signOut(auth);
+                    window.location.href = 'signup.html';
+                }
+            } catch (error) {
+                console.error('Logout error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to logout'
+                });
+            }
+        });
+        
         onAuthStateChanged(auth, user => {
             if (user) {
                 loadDraft();
             } else {
-                window.location.href = 'login.html';
+                window.location.href = 'signup.html';
             }
         });
 
         quill.on('text-change', function () {
             autoSave(quill.root.innerHTML);
-        });
-        onAuthStateChanged(auth, user => {
-            if (!user) {
-                window.location.href = 'signup.html';
-            }
         });
     </script>
 </body>
