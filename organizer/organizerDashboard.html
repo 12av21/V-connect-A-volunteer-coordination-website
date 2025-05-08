@@ -160,6 +160,7 @@
 
     <!-- Firebase Scripts -->
      <script src="../config/firebaseConfig.js"></script>
+     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import {
@@ -337,6 +338,7 @@
 
         document.getElementById('logoutBtn').addEventListener('click', async () => {
             try {
+                console.log("Attempting to log out...");
                 const result = await Swal.fire({
                     title: 'Are you sure?',
                     text: "You will be logged out of your account.",
@@ -348,22 +350,26 @@
                 });
 
                 if (result.isConfirmed) {
-                    await signOut(auth); // Ensure `auth` is properly initialized
+                    await signOut(auth); // Sign out the user
                     Swal.fire({
                         icon: 'success',
                         title: 'Logged Out',
                         text: 'You have been successfully logged out.',
-                        showConfirmButton: false,
-                        timer: 1500
+                        timer: 1500,
+                        showConfirmButton: false
                     });
-                    window.location.href = '../home/signup.html'; // Ensure the correct path to the signup page
+
+                    // Redirect to the login page
+                    setTimeout(() => {
+                        window.location.href = '../home/signup.html';
+                    }, 1500);
                 }
             } catch (error) {
                 console.error("Logout error:", error);
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'Failed to log out. Please try again.'
+                    text: 'An error occurred while logging out. Please try again.'
                 });
             }
         });
